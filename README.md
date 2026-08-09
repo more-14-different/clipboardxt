@@ -24,11 +24,11 @@ Start typing in File Explorer to search the current folder and its subfolders th
 
 ### Radical departures from upstream
 
-ClipboardXt deliberately does not treat compatibility with [upstream](https://github.com/chaojimct/clipboardx) as a design constraint. These are broad, sometimes breaking changes rather than a small patch set:
+Compared with the current [upstream](https://github.com/chaojimct/clipboardx), ClipboardXt is not a small patch set. Its main departures are:
 
-- **Architecture** — large WPF classes were split into task-focused partial modules and services; history/search now extends deeply into SQLite FTS, cold archives, lazy media loading, native clipboard paths, and a much broader automated test surface.
-- **Features** — the original utility grew into three coordinated panels, with bilingual UI, OCR, FIFO/LIFO queues, editable and favoritable history, standalone folder workflows, and Everything-backed search.
-- **Product form** — interaction defaults, shortcuts, panel state, themes, packaging flavors, installers, and update/release flow have all been reshaped around this project's keyboard-first preferences. ClipboardXt has its own name, repository, and releases; source branches and release artifacts should not be treated as interchangeable with upstream.
+- **Architecture** — upstream's multi-thousand-line window and controller classes have been dismantled into task-scoped partial files and small services. ClipboardXt also adds a dedicated test project with about 40 test classes, and extends the SQLite model with hot/cold archive buckets, FTS indexes, lazy hydration, and persisted source metadata.
+- **Functionality** — complete Chinese/English UI; Traditional Pinyin or Xiaohe Shuangpin search; cold-archive and source-app/title search; remembered query, caret, and filter state; configurable shortcuts for individual item actions; and a standalone folder panel that can paste or deliver paths, not only navigate dialogs.
+- **Interaction and data model** — the three panels now share a richer keyboard-first interaction model: editable search with caret, selection, mouse positioning, and undo; layered `Esc`; contextual shortcut guides; and source/file icons. Settings and history schemas gained new fields, tables, and indexes, while recent-folder behavior changed from threshold-based collection to a larger first-use MRU list.
 
 ---
 
@@ -54,11 +54,11 @@ ClipboardXt 围绕三个键盘优先的面板构建；三个面板均支持中�
 
 ### 与 upstream 的激进分歧
 
-ClipboardXt 有意不把与 [upstream](https://github.com/chaojimct/clipboardx) 保持兼容作为设计约束。以下改动并非一组便于回移的小补丁，而是范围较广、部分具有破坏性的重塑：
+相较于当前 [upstream](https://github.com/chaojimct/clipboardx)，ClipboardXt 已经不是一组小补丁，主要分歧包括：
 
-- **架构** — 将大型 WPF 类拆分为按职责组织的 partial 模块与服务；历史和搜索深入扩展到 SQLite FTS、冷归档、媒体懒加载、原生剪贴板路径，并建立了更广的自动化测试面。
-- **功能** — 从原有工具扩展为三个协同面板，并加入完整双语 UI、OCR、FIFO/LIFO 队列、历史编辑与收藏、独立文件夹工作流以及 Everything 检索。
-- **形式** — 围绕本项目偏好的键盘优先体验，重新塑造默认交互、快捷键、面板状态、主题、多 Flavor 打包、安装与更新发布流程。ClipboardXt 使用独立名称、仓库和发行版，不应将其源码分支或发行包视为可与 upstream 直接互换。
+- **架构** — 将 upstream 中数千行的窗口与控制器大类拆成按职责组织的 partial 文件和小型服务；新增约 40 个测试类的独立测试工程，并把 SQLite 模型扩展为冷热归档桶、FTS 索引、按需回填及持久化来源元数据。
+- **功能** — 增加完整中英文 UI、传统拼音 / 小鹤双拼切换、冷归档与来源应用/窗口标题检索、查询与光标及筛选状态记忆、每项条目动作的可配置快捷键；独立文件夹面板除打开目录和跳转对话框外，还能粘贴或投递路径。
+- **交互与数据形式** — 三个面板采用更完整的键盘优先交互：搜索框支持光标、选区、鼠标定位和撤销，`Esc` 按层级退出，并提供随上下文变化的快捷键指南和来源/文件图标。设置与历史库增加了新的字段、表和索引；最近目录也从达到次数阈值后收集，改为首次明确使用即进入更大的 MRU 列表。
 
 ---
 
