@@ -5,6 +5,16 @@ namespace ClipboardX.Tests;
 public sealed class StartupRegistrationTests
 {
     [Fact]
+    public void ManagesStartupRegistration_OnlyInReleaseBuilds()
+    {
+#if DEBUG
+        Assert.False(StartupRegistration.ManagesStartupRegistration);
+#else
+        Assert.True(StartupRegistration.ManagesStartupRegistration);
+#endif
+    }
+
+    [Fact]
     public void BuildScheduledTaskCreateArguments_UsesHighestOnLogonForExplicitUser()
     {
         var arguments = StartupRegistration.BuildScheduledTaskCreateArguments(

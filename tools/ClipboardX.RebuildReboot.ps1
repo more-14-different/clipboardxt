@@ -11,6 +11,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Debug builds intentionally leave Windows startup registration to the
+# developer-owned scheduled task. StartupRegistration manages its own task only
+# in Release builds, so this rebuild/relaunch workflow cannot overwrite it.
+
 if ($Release -and $Debug) {
     throw "Use either -Release or -Debug, not both."
 }

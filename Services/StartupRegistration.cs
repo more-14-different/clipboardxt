@@ -16,6 +16,22 @@ public static class StartupRegistration
     private const string ValueName = "ClipboardX";
     internal const string ScheduledTaskName = "ClipboardX_AutoStart";
 
+    /// <summary>
+    /// Debug builds are launched and registered by developer-owned tooling/tasks.
+    /// Only Release builds may mutate the application-owned startup registration.
+    /// </summary>
+    internal static bool ManagesStartupRegistration
+    {
+        get
+        {
+#if DEBUG
+            return false;
+#else
+            return true;
+#endif
+        }
+    }
+
     private static string? ResolveExecutablePathForStartup()
     {
         var processPath = Environment.ProcessPath;
@@ -39,6 +55,8 @@ public static class StartupRegistration
     /// </param>
     public static void Apply(bool runAtStartup, bool runAsAdministrator)
     {
+        if (!ManagesStartupRegistration) return;
+
         if (!runAtStartup)
         {
             RemoveRunKeyEntry();
@@ -62,7 +80,8 @@ public static class StartupRegistration
     }
 
     public static bool IsRegistered() =>
-        IsRunKeyRegistered() || IsScheduledTaskRegistered();
+        ManagesStartupRegistration
+        && (IsRunKeyRegistered() || IsScheduledTaskRegistered());
 
     private static bool IsRunKeyRegistered()
     {
