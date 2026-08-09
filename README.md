@@ -1,6 +1,6 @@
 # ClipboardXt
 
-An opinionated ClipboardX. This is a personal project that originated from [chaojimct/clipboardx](https://github.com/chaojimct/clipboardx) and now evolves independently.
+An opinionated ClipboardX, maintained as a hard fork of [chaojimct/clipboardx](https://github.com/chaojimct/clipboardx).
 
 **[English](#english)** · **[简体中文](#简体中文)** · [Releases](https://github.com/more-14-different/clipboardxt/releases)
 
@@ -36,7 +36,7 @@ Compared with the current [upstream](https://github.com/chaojimct/clipboardx), C
 
 ## 简体中文
 
-ClipboardXt 是一个有明确取舍的 ClipboardX。它源自 [chaojimct/clipboardx](https://github.com/chaojimct/clipboardx)，现已作为个人项目独立演进。
+ClipboardXt 是一个有明确取舍的 ClipboardX，也是 [chaojimct/clipboardx](https://github.com/chaojimct/clipboardx) 的 hard fork。
 
 ClipboardXt 围绕三个键盘优先的面板构建；三个面板均支持中英文界面、可配置快捷键与尽量不抢焦点的交互。
 
