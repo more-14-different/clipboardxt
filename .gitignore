@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+.vscode/
+.antigravitycli/
+
+# Binaries
+bin/
+obj/
+
+# Build artifacts
+artifacts/
+build/
+publish/
+publish-self-contained/
+installer/Output/
+ClipboardX-*-win-x64-*.zip
+
+ClipboardX/
+
+# Package manager
+
+# Debug files
+debug-*.log
+*.patch
+
+# Portable clipboard history (hot table and cold archive buckets)
+Data/clipboard_history.db*

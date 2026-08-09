@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClipboardX — 剪贴板历史与文件对话框跳转</title>
+<meta name="description" content="Windows 效率工具：不抢焦点的剪贴板历史、FIFO/LIFO 批量队列、文件对话框路径跳转。开源，.NET 8。">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#121212;
+  --panel:#1a1a1a;
+  --border:#2d2d2d;
+  --text:#e6e6e6;
+  --muted:#8a8a8a;
+  --faint:#5c5c5c;
+  --accent:#139493;
+  --accent-dim:rgba(19,148,147,.15);
+  --radius:6px;
+  --max-w:820px;
+  --font: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.65;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+a:hover{color:#1ab5b4}
+code{font-family:var(--mono);font-size:.88em;background:var(--panel);padding:.12em .4em;border-radius:4px;border:1px solid var(--border)}
+img{max-width:100%;vertical-align:middle}
+
+nav{
+  position:sticky;top:0;z-index:50;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+nav .inner{
+  max-width:var(--max-w);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:14px 22px;
+}
+nav .logo{
+  font-weight:600;font-size:1rem;color:var(--text);
+  text-decoration:none;
+}
+nav .logo:hover{color:var(--accent)}
+nav .links{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;font-size:.9rem}
+nav .links a{color:var(--muted);text-decoration:none}
+nav .links a:hover{color:var(--text)}
+nav .links .gh{border:1px solid var(--border);padding:5px 12px;border-radius:var(--radius);color:var(--text)}
+nav .links .gh:hover{border-color:var(--accent);color:var(--accent)}
+
+main{max-width:var(--max-w);margin:0 auto;padding:0 22px 64px}
+
+.head{padding:48px 0 40px;border-bottom:1px solid var(--border)}
+.head h1{
+  font-size:clamp(1.45rem,4vw,1.85rem);
+  font-weight:600;
+  letter-spacing:-.02em;
+  line-height:1.35;
+  max-width:38em;
+}
+.head .lede{color:var(--muted);margin-top:14px;max-width:36em;font-size:.98rem}
+.head .ver{display:inline-block;margin-top:10px;font-size:.82rem;color:var(--faint)}
+.head .cta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+.btn{
+  display:inline-block;padding:8px 16px;border-radius:var(--radius);
+  font-size:.9rem;font-weight:500;text-decoration:none;
+  border:1px solid var(--border);
+}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#0f7f7e;color:#fff}
+.btn-ghost{background:transparent;color:var(--text)}
+.btn-ghost:hover{border-color:var(--muted)}
+
+.meta-line{margin-top:18px;font-size:.85rem;color:var(--faint)}
+
+section{padding:40px 0;border-bottom:1px solid var(--border)}
+section:last-of-type{border-bottom:none}
+
+section h2{
+  font-size:1.05rem;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:6px;
+}
+section .kicker{font-size:.82rem;color:var(--muted);margin-bottom:22px}
+
+.demo-grid{display:grid;gap:20px}
+@media(min-width:720px){.demo-grid{grid-template-columns:1fr 1fr}}
+.demo-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.demo-card .cap{padding:10px 14px;font-size:.85rem;border-bottom:1px solid var(--border);color:var(--muted)}
+.demo-card .cap strong{color:var(--text);font-weight:500}
+.demo-card img{width:100%;display:block}
+
+.callout{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 18px 16px;
+  margin-bottom:24px;
+}
+.callout h3{font-size:.95rem;font-weight:600;margin-bottom:12px;color:var(--text)}
+.mode-table{width:100%;border-collapse:collapse;font-size:.86rem}
+.mode-table th,.mode-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.mode-table th{color:var(--muted);font-weight:500;width:7.5em}
+.mode-table tr:last-child th,.mode-table tr:last-child td{border-bottom:none}
+.swatch{display:inline-block;width:.65em;height:.65em;border-radius:2px;margin-right:6px;vertical-align:middle}
+.swatch-n{background:#139493}
+.swatch-f{background:#2563eb}
+.swatch-l{background:#ca8a04}
+
+.feat-block{margin-bottom:32px}
+.feat-block:last-child{margin-bottom:0}
+.feat-block > h3{font-size:.92rem;font-weight:600;color:var(--muted);margin-bottom:14px;text-transform:none;letter-spacing:0}
+.feat-grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+@media(min-width:640px){.feat-grid{grid-template-columns:1fr 1fr}}
+.feat-item{background:var(--bg);padding:16px 16px 14px}
+.feat-item h4{font-size:.9rem;font-weight:600;margin-bottom:6px}
+.feat-item p{font-size:.85rem;color:var(--muted);line-height:1.55}
+
+.compare-block{margin-bottom:28px}
+.compare-block:last-child{margin-bottom:0}
+.compare-block > h3{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:10px}
+table.data{width:100%;border-collapse:collapse;font-size:.82rem;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+table.data th,table.data td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+table.data tr:last-child td{border-bottom:none}
+table.data thead th{background:var(--panel);color:var(--muted);font-weight:500}
+table.data td:first-child{color:var(--text)}
+.yes{color:#6fcf97}
+.no{color:var(--faint)}
+.tag{font-size:.75rem;padding:1px 6px;border-radius:3px;background:var(--panel);border:1px solid var(--border);color:var(--muted)}
+
+.dl-grid{display:grid;gap:12px}
+@media(min-width:600px){.dl-grid{grid-template-columns:1fr 1fr}}
+.dl-item{border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--panel)}
+.dl-item h4{font-size:.9rem;font-weight:600;margin-bottom:6px}
+.dl-item p{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+.dl-item .btn{display:inline-block;width:100%;text-align:center}
+
+.footnote{font-size:.82rem;color:var(--muted);margin-top:20px;line-height:1.55}
+
+footer{padding:28px 22px 36px;max-width:var(--max-w);margin:0 auto;font-size:.82rem;color:var(--faint);text-align:left}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--accent)}
+footer .row{margin-top:8px}
+
+@media(max-width:520px){
+  nav .links .optional{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a class="logo" href="#">ClipboardX</a>
+    <div class="links">
+      <a href="#batch" class="optional">批量队列</a>
+      <a href="#features" class="optional">功能</a>
+      <a href="#compare" class="optional">对比</a>
+      <a href="#download">下载</a>
+      <a class="gh" href="https://github.com/chaojimct/clipboardx" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <header class="head">
+    <h1>剪贴板历史与「打开/保存」对话框跳转，合并在一个常驻托盘的小程序里。</h1>
+    <p class="lede">弹窗不抢焦点；可选 FIFO / LIFO 批量队列；拼音过滤；Shell 级路径跳转。面向 Windows 10 / 11（x64），开源。</p>
+    <span class="ver">文档与页面版本 1.5.0</span>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/chaojimct/clipboardx/releases">下载</a>
+      <a class="btn btn-ghost" href="https://github.com/chaojimct/clipboardx/blob/master/docs/ClipboardX-Introduction.md" target="_blank">完整介绍（Markdown）</a>
+    </div>
+    <p class="meta-line">技术栈：.NET 8 · WPF · 主程序仅少量 NuGet 依赖。完整版与「仅剪贴板」「仅跳转」剪裁包见 Releases。</p>
+  </header>
+
+  <section id="demo">
+    <h2>演示</h2>
+    <p class="kicker">剪贴板面板与文件对话框跳转（动图由仓库 static 提供）。</p>
+    <div class="demo-grid">
+      <div class="demo-card">
+        <div class="cap"><strong>剪贴板</strong> · 不抢焦点、可直接键入搜索</div>
+        <img src="https://raw.githubusercontent.com/chaojimct/clipboardx/master/static/clipx.gif" alt="剪贴板历史演示" loading="lazy" width="640" height="360">
+      </div>
+      <div class="demo-card">
+        <div class="cap"><strong>文件对话框</strong> · 热键跳转当前资源管理器路径</div>
+        <img src="https://raw.githubusercontent.com/chaojimct/clipboardx/master/static/jumpx.gif" alt="文件对话框跳转演示" loading="lazy" width="640" height="360">
+      </div>
+    </div>
+  </section>
+
+  <section id="batch">
+    <h2>批量粘贴队列（1.3）</h2>
+    <p class="kicker">三种模式可在顶栏或全局快捷键间切换；托盘图标与列表高亮会随模式变色，便于扫一眼确认状态。</p>
+
+    <div class="callout">
+      <h3>模式说明</h3>
+      <table class="mode-table">
+        <tr>
+          <th>普通</th>
+          <td>多选后 <code>Enter</code> 按列表顺序连续粘贴；可与「合并相邻纯文本」等选项配合。</td>
+        </tr>
+        <tr>
+          <th>FIFO</th>
+          <td>多选 <code>Enter</code> 入队。在任意目标窗口中，每次 <code>Ctrl+V</code> 或 <code>Shift+Insert</code> 出队一条并更新剪贴板。列表显示序号角标；新复制也可按规则自动入队。</td>
+        </tr>
+        <tr>
+          <th>LIFO</th>
+          <td>入队方式与快捷键相同，出队顺序为后进先出。</td>
+        </tr>
+      </table>
+      <p style="margin-top:14px;font-size:.85rem;color:var(--muted)">
+        默认全局循环切换键为 <strong>Alt+/</strong>（可在设置中修改）；顺序为 <strong>普通 → LIFO → FIFO → 普通</strong>，与面板顶栏一致。
+      </p>
+      <p style="margin-top:10px;font-size:.85rem;color:var(--muted)">
+        模式主色（顶栏标签、角标、托盘、面板内列表选中/悬停混合）：<span class="swatch swatch-n"></span>普通 <code>#139493</code>
+        · <span class="swatch swatch-f"></span>FIFO <code>#2563EB</code>
+        · <span class="swatch swatch-l"></span>LIFO <code>#CA8A04</code>。托盘在 FIFO/LIFO 下会叠加 F / L 标记。
+      </p>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2>功能</h2>
+    <p class="kicker">按场景拆开；与 Ditto、CopyQ、Listary 等差异见下文表格。</p>
+
+    <div class="feat-block">
+      <h3>剪贴板</h3>
+      <div class="feat-grid">
+        <div class="feat-item">
+          <h4>不抢焦点</h4>
+          <p>扩展样式与消息处理配合，使弹窗在多数操作中不激活为前台窗口，减轻 IDE 与输入法被打断的情况。</p>
+        </div>
+        <div class="feat-item">
+          <h4>靠近插入点</h4>
+          <p>优先根据插入符位置摆放面板，失败时再退回鼠标位置或配置项。</p>
+        </div>
+        <div class="feat-item">
+          <h4>过滤</h4>
+          <p>弹窗出现后可直接键入过滤；中文支持全拼与首字母索引。</p>
+        </div>
+        <div class="feat-item">
+          <h4>存储</h4>
+          <p>文本、图片（缩略图）、路径列表等；SQLite 持久化；默认可存数千条并去重置顶。</p>
+        </div>
+        <div class="feat-item">
+          <h4>主题</h4>
+          <p>暗色界面接近 VS Code Dark+ 的底与对比度；强调色与上述模式色一致。亮色为浅灰底。可跟随系统。</p>
+        </div>
+        <div class="feat-item">
+          <h4>快捷短语</h4>
+          <p>将常用条目固定为短语并单独视图管理；侧栏检索同样避免抢焦点。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-block">
+      <h3>文件对话框跳转</h3>
+      <div class="feat-grid">
+        <div class="feat-item">
+          <h4>Shell 导航</h4>
+          <p>在支持的公共对话框中通过原生 DLL 与 Shell 接口直接改目录，减少对地址栏模拟的依赖。</p>
+        </div>
+        <div class="feat-item">
+          <h4>多款管理器</h4>
+          <p>对常见双栏与增强资源管理器维护专用或半专用路径采集；其余按白名单遍历。</p>
+        </div>
+        <div class="feat-item">
+          <h4>WPS</h4>
+          <p>对非标准对话框走多条 UI Automation 与控件回退路径。</p>
+        </div>
+        <div class="feat-item">
+          <h4>自动化选项</h4>
+          <p>可选：对话框首次前台时自动拉路径；框内第一次点击自动跳转；从资源管理器切回时同步目录等。</p>
+        </div>
+        <div class="feat-item">
+          <h4>兼容模式</h4>
+          <p>可关闭注入，仅保留键入/地址栏模拟，便于在严格安全软件环境中使用。</p>
+        </div>
+        <div class="feat-item">
+          <h4>收藏与历史</h4>
+          <p>收藏目录与最近路径进入同一跳转列表，支持检索。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <h2>对比（摘录）</h2>
+    <p class="kicker">细节与引用见仓库内 <a href="https://github.com/chaojimct/clipboardx/blob/master/docs/ClipboardX-Introduction.md" target="_blank">ClipboardX-Introduction.md</a>。</p>
+
+    <div class="compare-block">
+      <h3>剪贴板：ClipboardX 与 Ditto / CopyQ</h3>
+      <table class="data">
+        <thead><tr><th>项目</th><th>ClipboardX</th><th>Ditto</th><th>CopyQ</th></tr></thead>
+        <tbody>
+          <tr><td>前台焦点</td><td class="yes">尽量不抢</td><td class="no">通常抢走</td><td class="no">通常抢走</td></tr>
+          <tr><td>跟随插入符</td><td class="yes">支持</td><td class="no">—</td><td class="no">—</td></tr>
+          <tr><td>拼音过滤</td><td class="yes">支持</td><td class="no">—</td><td class="no">—</td></tr>
+          <tr><td>FIFO/LIFO 出队粘贴</td><td class="yes">1.3+</td><td class="no">—</td><td class="no">—</td></tr>
+          <tr><td>替换系统 Win+V</td><td class="yes">可选</td><td class="no">—</td><td class="no">—</td></tr>
+          <tr><td>历史文本就地编辑</td><td class="yes">支持</td><td class="no">—</td><td class="no">需脚本</td></tr>
+          <tr><td>数字快捷粘贴（主键+1~9）</td><td class="yes">支持</td><td class="no">—</td><td class="no">—</td></tr>
+          <tr><td>暗色</td><td>近 VS Code Dark+ · 模式色</td><td>有限</td><td>内置多套，不跟随系统</td></tr>
+          <tr><td>内置文件对话框跳转</td><td class="yes">完整版</td><td class="no">—</td><td class="no">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="compare-block">
+      <h3>跳转：ClipboardX 与 Listary / 典型 AHK 脚本</h3>
+      <table class="data">
+        <thead><tr><th>项目</th><th>ClipboardX</th><th>Listary</th><th>AHK 系</th></tr></thead>
+        <tbody>
+          <tr><td>实现</td><td><span class="tag">托管 + 原生 DLL</span></td><td><span class="tag">闭源</span></td><td><span class="tag">脚本模拟为主</span></td></tr>
+          <tr><td>Shell 级 BrowseObject</td><td class="yes">支持（可关）</td><td class="yes">有</td><td class="no">无</td></tr>
+          <tr><td>失败回退</td><td class="yes">自动</td><td class="yes">有</td><td class="no">视脚本</td></tr>
+          <tr><td>管理器覆盖</td><td class="yes">宽</td><td class="yes">宽</td><td>参差</td></tr>
+          <tr><td>WPS</td><td class="yes">多条路径</td><td>部分</td><td>部分</td></tr>
+          <tr><td>资源管理器 Everything 筛选</td><td class="yes">直接键入</td><td class="no">—</td><td class="no">无</td></tr>
+          <tr><td>自定义对话框规则</td><td class="yes">向导 + 导入导出</td><td class="no">—</td><td class="no">无</td></tr>
+          <tr><td>开源</td><td class="yes">是</td><td class="no">否</td><td class="yes">常见</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="download">
+    <h2>下载</h2>
+    <p class="kicker">安装包与 zip 名称中的版本号以 <a href="https://github.com/chaojimct/clipboardx/releases" target="_blank">Releases</a> 为准。</p>
+    <div class="dl-grid">
+      <div class="dl-item">
+        <h4>安装包（依赖运行时）</h4>
+        <p>体积小，需本机安装 .NET 8 桌面运行时。</p>
+        <a class="btn btn-ghost" href="https://github.com/chaojimct/clipboardx/releases">打开 Releases</a>
+      </div>
+      <div class="dl-item">
+        <h4>安装包（自包含）</h4>
+        <p>自带运行时，适合不便装 SDK 的机器。</p>
+        <a class="btn btn-primary" href="https://github.com/chaojimct/clipboardx/releases">打开 Releases</a>
+      </div>
+      <div class="dl-item">
+        <h4>绿色 zip（依赖运行时）</h4>
+        <p>解压到固定目录后运行；配置与数据库默认在 exe 旁 <code>Data\</code>。</p>
+        <a class="btn btn-ghost" href="https://github.com/chaojimct/clipboardx/releases">打开 Releases</a>
+      </div>
+      <div class="dl-item">
+        <h4>绿色 zip（自包含）</h4>
+        <p>单文件发布变体同样将用户数据落在启动目录下的 <code>Data\</code>，而非 Temp 解压目录。</p>
+        <a class="btn btn-primary" href="https://github.com/chaojimct/clipboardx/releases">打开 Releases</a>
+      </div>
+    </div>
+    <p class="footnote">若使用托盘「安装到当前用户」，数据根可能迁至 <code>%LocalAppData%\ClipboardX\</code>；剪裁版 exe 名带后缀。完整说明见仓库 README。</p>
+  </section>
+</main>
+
+<footer>
+  <p><a href="https://github.com/chaojimct/clipboardx" target="_blank">仓库</a>
+    · <a href="https://github.com/chaojimct/clipboardx/releases" target="_blank">发行版</a>
+    · <a href="https://github.com/chaojimct/clipboardx/issues" target="_blank">Issues</a></p>
+  <p class="row">ClipboardX — 本地工具，非云端服务。</p>
+</footer>
+
+</body>
+</html>
