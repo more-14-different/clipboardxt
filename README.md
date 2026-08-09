@@ -144,7 +144,7 @@ The repository also contains an early macOS/Avalonia clipboard-only client under
 
 轻量级 Windows **剪贴板历史 + 文件对话框跳转**二合一工具：剪贴板弹窗**不抢焦点**（`WS_EX_NOACTIVATE`），并支持在「打开 / 保存」等窗口中一键跳转到资源管理器或常用目录（默认 **Ctrl+G**）。
 
-### 本 fork 相对 upstream 的重点差异
+### 本 fork 相对 [upstream](github.com/chaojimct/clipboardx) 的重点差异
 
 - 新增**完整英文 UI**，在 **设置 → 通用 → 界面语言**中一键切换**简体中文 / English**。
 - 语言选择写入 `settings.json`；切换后当前窗口即时刷新，点**取消**会恢复原语言，保存后下次启动继续生效。
