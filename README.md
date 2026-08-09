@@ -1,4 +1,4 @@
-# ClipboardX
+# ClipboardXt
 
 **[English](#english)** · **[简体中文](#简体中文)**
 
@@ -8,9 +8,9 @@
 
 ## English
 
-ClipboardX is a lightweight Windows utility combining **clipboard history** and **file-dialog folder jumping**. Its clipboard popup does **not steal focus** (`WS_EX_NOACTIVATE`), and its folder picker can move an Open/Save dialog to a File Explorer or favorite directory with one shortcut (default: **Ctrl+G**).
+ClipboardX(t) is a lightweight Windows utility combining **clipboard history** and **file-dialog folder jumping**. Its clipboard popup does **not steal focus** (`WS_EX_NOACTIVATE`), and its folder picker can move an Open/Save dialog to a File Explorer or favorite directory with one shortcut (default: **Ctrl+G**).
 
-### What this fork changes from upstream
+### What this hard fork changes from [upstream](github.com/chaojimct/clipboardx)
 
 This repository tracks the upstream project while carrying a substantially enhanced feature branch. The most visible fork-specific addition is the complete bilingual front end introduced here.
 
