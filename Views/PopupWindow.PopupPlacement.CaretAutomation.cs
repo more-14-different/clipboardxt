@@ -36,6 +36,8 @@ public partial class PopupWindow : Window
                 if (focused == null)
                     return new CaretAutomationResult(false, 0, 0, "no-focused");
 
+                var className = focused.Current.ClassName;
+
                 if (focused.TryGetCurrentPattern(
                         System.Windows.Automation.TextPattern.Pattern, out var p))
                 {
@@ -45,6 +47,17 @@ public partial class PopupWindow : Window
                         var rects = sel[0].GetBoundingRectangles();
                         if (rects.Length > 0 && (rects[0].X > 0 || rects[0].Y > 0))
                         {
+                            // Chromium can expose its whole content surface as a fake
+                            // selection rectangle with an empty automation class.
+                            if (!PopupPlacementCalculator.HasUsableAutomationClassName(className))
+                            {
+                                return new CaretAutomationResult(
+                                    false,
+                                    0,
+                                    0,
+                                    "text-sel-empty-cls");
+                            }
+
                             return new CaretAutomationResult(
                                 true,
                                 rects[0].X,
@@ -57,6 +70,31 @@ public partial class PopupWindow : Window
                 var rect = focused.Current.BoundingRectangle;
                 if (!rect.IsEmpty && rect.Width > 0 && rect.Height > 0)
                 {
+                    if (!PopupPlacementCalculator.HasUsableAutomationClassName(className))
+                    {
+                        return new CaretAutomationResult(
+                            false,
+                            0,
+                            0,
+                            "bound-rect-empty-cls");
+                    }
+
+                    var foregroundWindow = Win32.GetForegroundWindow();
+                    if (foregroundWindow != IntPtr.Zero
+                        && Win32.GetWindowRect(foregroundWindow, out var foregroundRect)
+                        && PopupPlacementCalculator.CoversForegroundWindow(
+                            rect.Width,
+                            rect.Height,
+                            foregroundRect.Right - foregroundRect.Left,
+                            foregroundRect.Bottom - foregroundRect.Top))
+                    {
+                        return new CaretAutomationResult(
+                            false,
+                            0,
+                            0,
+                            "bound-rect-window-level");
+                    }
+
                     return new CaretAutomationResult(
                         true,
                         rect.X + 20,

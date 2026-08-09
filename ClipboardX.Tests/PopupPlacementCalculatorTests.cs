@@ -6,6 +6,56 @@ namespace ClipboardX.Tests;
 public sealed class PopupPlacementCalculatorTests
 {
     [Theory]
+    [InlineData(10, 20, 11, 40, true)]
+    [InlineData(0, 0, 0, 0, false)]
+    [InlineData(10, 20, 10, 40, false)]
+    [InlineData(10, 20, 11, 20, false)]
+    public void HasUsableNativeCaretBounds_RequiresPositiveWidthAndHeight(
+        int left,
+        int top,
+        int right,
+        int bottom,
+        bool expected)
+    {
+        Assert.Equal(
+            expected,
+            PopupPlacementCalculator.HasUsableNativeCaretBounds(left, top, right, bottom));
+    }
+
+    [Theory]
+    [InlineData("Edit", true)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void HasUsableAutomationClassName_RejectsMissingClassName(
+        string? className,
+        bool expected)
+    {
+        Assert.Equal(expected, PopupPlacementCalculator.HasUsableAutomationClassName(className));
+    }
+
+    [Theory]
+    [InlineData(1920, 1080, 1920, 1080, true)]
+    [InlineData(1900, 1080, 1920, 1080, true)]
+    [InlineData(1800, 1048, 1920, 1080, false)]
+    [InlineData(0, 1080, 1920, 1080, false)]
+    [InlineData(1920, 1080, 0, 0, false)]
+    public void CoversForegroundWindow_UsesAreaThreshold(
+        double candidateWidth,
+        double candidateHeight,
+        double foregroundWidth,
+        double foregroundHeight,
+        bool expected)
+    {
+        Assert.Equal(
+            expected,
+            PopupPlacementCalculator.CoversForegroundWindow(
+                candidateWidth,
+                candidateHeight,
+                foregroundWidth,
+                foregroundHeight));
+    }
+
+    [Theory]
     [InlineData(400, 200, 300, 1.5, 2.0, 600, 400)]
     [InlineData(400, 0, 300, 1.25, 1.5, 500, 450)]
     public void ToPhysicalSize_UsesActualHeightOrFallsBackToMaxHeight(

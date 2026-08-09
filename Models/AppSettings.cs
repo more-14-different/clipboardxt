@@ -89,7 +89,7 @@ public partial class AppSettings
     /// <summary>登录 Windows 时自动启动本程序（默认开启）。</summary>
     public bool RunAtStartup { get; set; } = true;
 
-    /// <summary>为 true 时，每次手动启动或开机自启均请求 UAC 以管理员身份运行（用户取消则退回普通权限）。</summary>
+    /// <summary>为 true 时，手动启动请求 UAC；开机自启通过最高权限计划任务运行，不在登录时弹出 UAC。</summary>
     public bool RunAsAdministrator { get; set; } = true;
 
     /// <summary>向目标窗口模拟粘贴：<see cref="PasteSimulationModes.CtrlV"/>（Ctrl+V）或 <see cref="PasteSimulationModes.ShiftInsert"/>。</summary>

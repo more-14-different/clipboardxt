@@ -538,7 +538,7 @@
                                 Background="{DynamicResource SurfaceBrush}" CornerRadius="4" Padding="10,7"
                                 BorderThickness="1" BorderBrush="{DynamicResource ThemeBorder}"
                                 Cursor="Hand" MouseLeftButtonUp="RunAsAdminCycle_Click"
-                                ToolTip="开启后每次启动会弹出 UAC；若取消则仍以普通权限运行。开机自启亦会请求提升。">
+                                ToolTip="开启后手动启动会弹出 UAC；开机自启通过最高权限计划任务运行，登录时不弹 UAC。">
                             <TextBlock x:Name="RunAsAdminText" Foreground="{DynamicResource PrimaryText}" FontSize="14"
                                        HorizontalAlignment="Center" />
                         </Border>

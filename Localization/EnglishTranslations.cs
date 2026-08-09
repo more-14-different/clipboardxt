@@ -108,7 +108,7 @@ internal static partial class EnglishTranslations
         ["启动时检查更新"] = "Check for Updates at Startup",
         ["开机自启动"] = "Start with Windows",
         ["以管理员身份启动"] = "Run as Administrator",
-        ["开启后每次启动会弹出 UAC；若取消则仍以普通权限运行。开机自启亦会请求提升。"] = "Shows a UAC prompt on every launch. If canceled, the app continues without elevation. Startup launch also requests elevation.",
+        ["开启后手动启动会弹出 UAC；开机自启通过最高权限计划任务运行，登录时不弹 UAC。"] = "Manual launches show a UAC prompt. Startup uses a highest-privilege scheduled task without a logon UAC prompt.",
         ["点击外部隐藏"] = "Hide When Clicking Outside",
         ["退出时自动清空历史"] = "Clear History on Exit",
         ["退出程序时自动清空剪贴板历史记录（快捷短语不受影响）"] = "Automatically clear clipboard history when the app exits (quick phrases are preserved).",

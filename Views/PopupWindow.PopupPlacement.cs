@@ -128,7 +128,13 @@ public partial class PopupWindow : Window
         var fgThread = Win32.GetWindowThreadProcessId(_targetWindow, out _);
         var gti = new Win32.GUITHREADINFO { cbSize = Marshal.SizeOf<Win32.GUITHREADINFO>() };
 
-        if (Win32.GetGUIThreadInfo(fgThread, ref gti) && gti.hwndCaret != IntPtr.Zero)
+        if (Win32.GetGUIThreadInfo(fgThread, ref gti)
+            && gti.hwndCaret != IntPtr.Zero
+            && PopupPlacementCalculator.HasUsableNativeCaretBounds(
+                gti.rcCaret.Left,
+                gti.rcCaret.Top,
+                gti.rcCaret.Right,
+                gti.rcCaret.Bottom))
         {
             var pt = new Win32.POINT { X = gti.rcCaret.Left, Y = gti.rcCaret.Bottom };
             Win32.ClientToScreen(gti.hwndCaret, ref pt);
@@ -219,14 +225,42 @@ public partial class PopupWindow : Window
 
     private void SetPositionWithOffset(double physX, double physY)
     {
-        var screen = System.Windows.Forms.Screen.FromPoint(
-            new System.Drawing.Point((int)physX, (int)physY));
-        var work = screen.WorkingArea;
-
+        var monitorPoint = new Win32.POINT { X = (int)physX, Y = (int)physY };
         var hMon = Win32.MonitorFromPoint(
-            new Win32.POINT { X = (int)physX, Y = (int)physY },
+            monitorPoint,
             Win32.MONITOR_DEFAULTTONEAREST);
-        Win32.GetDpiForMonitor(hMon, 0, out uint monDpiX, out uint monDpiY);
+
+        // Anchor coordinates are physical pixels. WinForms Screen.WorkingArea can be
+        // DPI-virtualized, so prefer the physical rcWork returned by Win32.
+        System.Drawing.Rectangle work;
+        var monitorInfo = new Win32.MONITORINFO
+        {
+            cbSize = Marshal.SizeOf<Win32.MONITORINFO>()
+        };
+        if (hMon != IntPtr.Zero && Win32.GetMonitorInfo(hMon, ref monitorInfo))
+        {
+            work = System.Drawing.Rectangle.FromLTRB(
+                monitorInfo.rcWork.Left,
+                monitorInfo.rcWork.Top,
+                monitorInfo.rcWork.Right,
+                monitorInfo.rcWork.Bottom);
+        }
+        else
+        {
+            work = System.Windows.Forms.Screen.FromPoint(
+                new System.Drawing.Point(monitorPoint.X, monitorPoint.Y)).WorkingArea;
+        }
+
+        uint monDpiX = 96;
+        uint monDpiY = 96;
+        if (hMon != IntPtr.Zero
+            && Win32.GetDpiForMonitor(hMon, 0, out var detectedDpiX, out var detectedDpiY) == 0
+            && detectedDpiX > 0
+            && detectedDpiY > 0)
+        {
+            monDpiX = detectedDpiX;
+            monDpiY = detectedDpiY;
+        }
         double scaleX = monDpiX / 96.0;
         double scaleY = monDpiY / 96.0;
 

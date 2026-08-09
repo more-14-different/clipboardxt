@@ -8,6 +8,33 @@ internal static class PopupPlacementCalculator
 
     internal readonly record struct Position(int X, int Y);
 
+    internal static bool HasUsableNativeCaretBounds(
+        int left,
+        int top,
+        int right,
+        int bottom) => right > left && bottom > top;
+
+    internal static bool HasUsableAutomationClassName(string? className) =>
+        !string.IsNullOrEmpty(className);
+
+    internal static bool CoversForegroundWindow(
+        double candidateWidth,
+        double candidateHeight,
+        double foregroundWidth,
+        double foregroundHeight,
+        double threshold = 0.95)
+    {
+        if (candidateWidth <= 0 || candidateHeight <= 0
+            || foregroundWidth <= 0 || foregroundHeight <= 0)
+        {
+            return false;
+        }
+
+        var foregroundArea = foregroundWidth * foregroundHeight;
+        var candidateArea = candidateWidth * candidateHeight;
+        return candidateArea / foregroundArea >= threshold;
+    }
+
     internal static PhysicalSize ToPhysicalSize(
         double width,
         double actualHeight,
