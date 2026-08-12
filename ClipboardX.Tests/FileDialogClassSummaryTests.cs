@@ -4,6 +4,26 @@ namespace ClipboardX.Tests;
 
 public sealed class FileDialogClassSummaryTests
 {
+    [Theory]
+    [InlineData("打开文件 - 安全警告")]
+    [InlineData("打开文件—安全警告")]
+    [InlineData("Open File - Security Warning")]
+    [InlineData("OPEN FILE — SECURITY WARNING")]
+    public void KnownNonFileDialogTitle_RecognizesWindowsOpenFileSecurityWarning(string title)
+    {
+        Assert.True(FileDialogJumpHelper.IsKnownNonFileDialogTitle(title));
+    }
+
+    [Theory]
+    [InlineData("打开文件")]
+    [InlineData("安全警告")]
+    [InlineData("Open File")]
+    [InlineData("Security Warning")]
+    public void KnownNonFileDialogTitle_DoesNotRejectPartialSecurityWarningTitle(string title)
+    {
+        Assert.False(FileDialogJumpHelper.IsKnownNonFileDialogTitle(title));
+    }
+
     [Fact]
     public void Observe_StopsWhenHighestPriorityDirectUiKindIsKnown()
     {

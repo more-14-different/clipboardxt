@@ -293,10 +293,20 @@ internal static partial class FileDialogJumpHelper
                || t.Contains("browse", StringComparison.Ordinal);
     }
 
-    private static bool IsKnownNonFileDialogTitle(string title)
+    internal static bool IsKnownNonFileDialogTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title)) return false;
         var t = title.Trim().ToLowerInvariant();
+
+        // Windows Attachment Manager 的运行确认框同样使用 #32770，标题还会命中
+        // IsFileDialogTitle 的「打开文件 / open file」兜底，但它不是文件选择窗口。
+        // 同时要求「打开文件」和「安全警告」，避免排除其他类型的安全提示。
+        if (title.Contains("打开文件", StringComparison.Ordinal)
+            && title.Contains("安全警告", StringComparison.Ordinal))
+            return true;
+        if (t.Contains("open file", StringComparison.Ordinal)
+            && t.Contains("security warning", StringComparison.Ordinal))
+            return true;
 
         // Sublime Text 等编辑器的保存确认框是 #32770，标题含 save，但不是文件对话框。
         if (t.Contains("save changes", StringComparison.Ordinal)) return true;
