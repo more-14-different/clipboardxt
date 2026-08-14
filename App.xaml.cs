@@ -107,6 +107,23 @@ public partial class App : Application
             return;
         }
 
+        var addFolderFavoriteRequested = FolderFavoriteCommand.IsRequested(e.Args);
+        string? requestedFavoritePath = null;
+        if (addFolderFavoriteRequested)
+        {
+            if (!FolderFavoriteCommand.TryParse(e.Args, out requestedFavoritePath))
+            {
+                Shutdown(2);
+                return;
+            }
+
+            if (FolderFavoriteCommand.TrySendToRunningInstance(requestedFavoritePath))
+            {
+                Shutdown(0);
+                return;
+            }
+        }
+
         _settings = AppSettings.Load();
         UiLanguage.Initialize(_settings.UiLanguage);
 
@@ -122,6 +139,13 @@ public partial class App : Application
         _mutex = new Mutex(true, AppPaths.MutexName, out bool isNew);
         if (!isNew)
         {
+            if (requestedFavoritePath != null)
+            {
+                var sent = FolderFavoriteCommand.TrySendToRunningInstance(
+                    requestedFavoritePath, timeoutMilliseconds: 1800);
+                Shutdown(sent ? 0 : 3);
+                return;
+            }
 #if DEBUG
             try { Console.WriteLine("ClipboardX 已在运行中（互斥锁），本进程将退出。请查看托盘或结束旧进程。"); } catch { }
 #endif
@@ -130,6 +154,15 @@ public partial class App : Application
             Shutdown();
             return;
         }
+
+        if (requestedFavoritePath != null
+            && !FolderFavoriteCommand.TryAdd(_settings, requestedFavoritePath, out _))
+        {
+            Shutdown(2);
+            return;
+        }
+
+        StartFolderFavoriteCommandServer();
 
         ThemeManager.Apply(_settings.Theme);
         // 启动时如果启用了替换 Win+V，先禁用系统剪贴板历史
@@ -203,6 +236,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _folderFavoriteCommandServer?.Dispose();
+        _folderFavoriteCommandServer = null;
         AppSettings.FlushPendingSave();
 
         if (_settings.ClearHistoryOnExit)
