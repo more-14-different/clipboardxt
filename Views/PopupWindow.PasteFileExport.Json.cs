@@ -26,25 +26,8 @@ namespace ClipboardManager;
 
 public partial class PopupWindow : Window
 {
-    private static bool IsWellFormedJson(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return false;
-        try
-        {
-            using var _ = JsonDocument.Parse(
-                text,
-                new JsonDocumentOptions
-                {
-                    AllowTrailingCommas = false,
-                    CommentHandling = JsonCommentHandling.Disallow
-                });
-            return true;
-        }
-        catch (JsonException)
-        {
-            return false;
-        }
-    }
+    private static bool IsWellFormedJson(string? text) =>
+        ClipboardFileExportPlanner.IsWellFormedJson(text);
 
     /// <summary>
     /// 文本为合法 JSON 时写入临时 .json 文件并置于剪贴板文件列表，在资源管理器中粘贴即可落盘。

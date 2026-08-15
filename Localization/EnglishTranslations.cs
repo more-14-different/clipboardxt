@@ -122,7 +122,7 @@ internal static partial class EnglishTranslations
         ["条目键"] = "Item Shortcut",
         ["选中操作"] = "Selected Item Actions",
         ["粘贴"] = "Paste",
-        ["图片/文本作为文件粘贴"] = "Paste Image/Text as File",
+        ["图片/文本/文件作为文件粘贴"] = "Paste Image/Text/Files as File",
         ["粘贴为 JSON 文件"] = "Paste as JSON File",
         ["编辑文本"] = "Edit Text",
         ["设为/修改快捷短语"] = "Set/Edit Quick Phrase",

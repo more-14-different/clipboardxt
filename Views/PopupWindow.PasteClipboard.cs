@@ -31,7 +31,7 @@ public partial class PopupWindow : Window
             var dir = Path.Combine(Path.GetTempPath(), "ClipboardX");
             if (!Directory.Exists(dir)) return;
             var threshold = DateTime.UtcNow.AddHours(-24);
-            foreach (var f in Directory.GetFiles(dir, "clip_*.png"))
+            foreach (var f in Directory.GetFiles(dir, "clip_*.*"))
             {
                 try
                 {

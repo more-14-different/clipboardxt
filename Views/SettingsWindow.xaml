@@ -673,7 +673,7 @@
                                 <Border Grid.Column="1" Tag="ClipboardPaste" Style="{StaticResource ItemActionHotkeyBoxStyle}"><TextBlock x:Name="ClipboardPasteHotkeyText" Style="{StaticResource ItemActionHotkeyTextStyle}"/></Border>
                             </Grid>
                             <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="140"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="图片/文本作为文件粘贴" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryText}"/>
+                                <TextBlock Text="图片/文本/文件作为文件粘贴" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryText}"/>
                                 <Border Grid.Column="1" Tag="ClipboardPasteAsFile" Style="{StaticResource ItemActionHotkeyBoxStyle}"><TextBlock x:Name="ClipboardPasteAsFileHotkeyText" Style="{StaticResource ItemActionHotkeyTextStyle}"/></Border>
                             </Grid>
                             <Grid Margin="0,4"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="140"/></Grid.ColumnDefinitions>

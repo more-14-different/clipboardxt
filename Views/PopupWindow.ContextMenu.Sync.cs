@@ -29,11 +29,16 @@ public partial class PopupWindow : Window
     private void SyncContextMenuForEntry(ClipboardEntry entry)
     {
         _contextEntry = entry;
-        ItemsList.SelectedItem = entry;
+        if (!ItemsList.SelectedItems.Contains(entry))
+        {
+            ItemsList.SelectedItems.Clear();
+            ItemsList.SelectedItems.Add(entry);
+        }
         CtxStarText.Text = entry.IsStarred ? "☆ 取消收藏" : "★ 收藏";
         CtxStarBorder.Visibility = entry.IsQuickPaste ? Visibility.Collapsed : Visibility.Visible;
         CtxShortcutText.Text = !string.IsNullOrWhiteSpace(entry.ShortcutPhrase) ? "⚡ 修改快捷短语" : "⚡ 设为快捷短语";
-        CtxPasteAsFileBorder.Visibility = entry.Type is EntryType.Image or EntryType.Text
+        CtxPasteAsFileBorder.Visibility = ItemsList.SelectedItems.Cast<ClipboardEntry>()
+            .Any(ClipboardFileExportPlanner.CanExport)
             ? Visibility.Visible
             : Visibility.Collapsed;
         CtxPasteJsonFileBorder.Visibility = entry.Type == EntryType.Text && IsWellFormedJson(entry.TextContent)

@@ -29,13 +29,20 @@ public partial class PopupWindow : Window
     /// <summary>
     /// 将临时文件路径写入剪贴板文件列表并模拟粘贴，供资源管理器接收。
     /// </summary>
-    private async Task CompletePasteTempFileToExplorerAsync(string path, string beginLogDetail, string setClipboardLogOp)
+    private Task CompletePasteTempFileToExplorerAsync(string path, string beginLogDetail, string setClipboardLogOp) =>
+        CompletePasteFilesToExplorerAsync([path], [path], beginLogDetail, setClipboardLogOp);
+
+    private async Task CompletePasteFilesToExplorerAsync(
+        IReadOnlyList<string> paths,
+        IReadOnlyList<string> createdTempPaths,
+        string beginLogDetail,
+        string setClipboardLogOp)
     {
         if (_targetWindow != IntPtr.Zero && !Win32.IsWindow(_targetWindow))
             _targetWindow = IntPtr.Zero;
 
         ClipboardDiagnosticsLog.Write(
-            $"pasteAsFile BEGIN {beginLogDetail} temp=\"{path}\" target=0x{_targetWindow.ToInt64():X}");
+            $"pasteAsFile BEGIN {beginLogDetail} count={paths.Count} target=0x{_targetWindow.ToInt64():X}");
 
         if (!_popupPinned)
             HidePopup();
@@ -49,13 +56,14 @@ public partial class PopupWindow : Window
 
         _isSettingClipboard = true;
         var nativeOk = await NativeClipboardWriteRetry.TrySetAsync(
-            () => Win32.TrySetClipboardFileDropListNative(new[] { path }, _hwnd),
+            () => Win32.TrySetClipboardFileDropListNative(paths.ToArray(), _hwnd),
             setClipboardLogOp,
             _hwnd,
             maxRetries: 8,
             baseDelayMs: 60);
         var fl = new StringCollection();
-        fl.Add(path);
+        foreach (var path in paths)
+            fl.Add(path);
         bool clipboardOk = nativeOk || await ClipboardWriteRetry.TrySetAsync(
             () => System.Windows.Clipboard.SetFileDropList(fl),
             setClipboardLogOp,
@@ -66,7 +74,10 @@ public partial class PopupWindow : Window
         if (!clipboardOk)
         {
             _isSettingClipboard = false;
-            try { File.Delete(path); } catch { /* ignore */ }
+            foreach (var path in createdTempPaths)
+            {
+                try { File.Delete(path); } catch { /* ignore */ }
+            }
         }
         else
         {

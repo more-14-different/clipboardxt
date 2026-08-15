@@ -83,7 +83,7 @@ public partial class PopupWindow : Window
                 if (contextOpen) ActivateCtxPaste();
                 else HandleMainEnterKey();
                 break;
-            case ClipboardItemAction.PasteAsFile when entry.Type is EntryType.Image or EntryType.Text:
+            case ClipboardItemAction.PasteAsFile:
                 ActivateCtxPasteAsFile();
                 break;
             case ClipboardItemAction.PasteJson
@@ -125,17 +125,9 @@ public partial class PopupWindow : Window
 
     private void ActivateCtxPasteAsFile()
     {
+        var contextEntry = _contextEntry;
         CloseContextMenuPopup();
-        if (_contextEntry is { } entry && entry.Type is EntryType.Image or EntryType.Text)
-        {
-            ItemsList.SelectedItem = entry;
-            if (entry.Type == EntryType.Image)
-                PasteImageAsFileForExplorer();
-            else if (IsWellFormedJson(entry.TextContent))
-                PasteJsonAsFileForExplorer();
-            else
-                PasteTextAsFileForExplorer();
-        }
+        PasteSelectedItemsAsFilesForExplorer(contextEntry);
     }
 
     private void ActivateCtxPasteJsonFile()

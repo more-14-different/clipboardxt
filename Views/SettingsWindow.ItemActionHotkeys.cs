@@ -70,7 +70,7 @@ public partial class SettingsWindow : Window
         var clipboard = new List<(string Label, uint Modifiers, uint Key)>
         {
             Item("粘贴", "ClipboardPaste"),
-            Item("图片作为文件粘贴", "ClipboardPasteAsFile"),
+            Item("图片/文本/文件作为文件粘贴", "ClipboardPasteAsFile"),
             Item("粘贴为 JSON 文件", "ClipboardPasteJson"),
             Item("编辑文本", "ClipboardEditText"),
             Item("设为/修改快捷短语", "ClipboardShortcutPhrase"),
