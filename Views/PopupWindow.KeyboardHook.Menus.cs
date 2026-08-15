@@ -19,6 +19,8 @@ public partial class PopupWindow : Window
         }
 
         _swallowedMenuAltLatch = false;
+        if (kb.vkCode == Win32.VK_RMENU)
+            _swallowedRightAltLatch = false;
         if (_isPhraseEditPopupOpen)
         {
             result = Win32.CallNextHookEx(_keyboardHook, nCode, wParam, lParam);

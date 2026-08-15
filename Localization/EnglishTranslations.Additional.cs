@@ -162,6 +162,8 @@ internal static partial class EnglishTranslations
         ["管理菜单"] = "Management Menu",
         ["过滤"] = "Filter",
         ["换行连贴"] = "Paste with Newlines",
+        ["打开网址"] = "Open Web URLs",
+        ["用默认浏览器打开当前文本中的合法 http/https 网址；多选时按列表顺序过滤并打开。"] = "Open valid http/https URLs from the current text in the default browser. With multiple selections, filter and open them in list order.",
         ["仅看短语"] = "Phrases Only",
         ["可试拼音全拼或首字母，如「nihao」「nh」"] = "Try full Pinyin or initials, such as “nihao” or “nh”.",
         ["可试小鹤双拼全码或声母串，如「nihc」「nh」"] = "Try full Xiaohe Shuangpin codes or initial strings, such as “nihc” or “nh”.",

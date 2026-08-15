@@ -146,6 +146,8 @@ public partial class PopupWindow : Window
     /// 主面板吞掉 Alt KeyDown 后，系统往往仍报告 Alt 未按下；锁存到 Alt KeyUp，供 Alt+/、Alt+` 等与 VkToChar 防录入对齐。
     /// </summary>
     private bool _swallowedMenuAltLatch;
+    /// <summary>主面板吞掉右 Alt KeyDown 后锁存到 KeyUp，用于区分 RAlt+Enter 与原有 Alt+Enter。</summary>
+    private bool _swallowedRightAltLatch;
     /// <summary>Win+V 被本程序拦截后，吞掉后续 Win KeyUp 以防止开始菜单弹出。</summary>
     private bool _winVIntercepted;
     private readonly List<(Border Row, Action Activate)> _contextMenuNav = new();

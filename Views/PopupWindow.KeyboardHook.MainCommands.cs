@@ -33,6 +33,9 @@ public partial class PopupWindow : Window
             case MainCommandKind.TogglePointSelection:
                 ToggleKeyboardPointSelection();
                 break;
+            case MainCommandKind.OpenSelectedWebUrls:
+                OpenSelectedWebUrls();
+                break;
             case MainCommandKind.CommitSelection:
                 HandleMainEnterKey(
                     command.NewlineAfterEachText,

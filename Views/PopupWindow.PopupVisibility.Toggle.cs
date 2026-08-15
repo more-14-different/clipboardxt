@@ -142,6 +142,7 @@ public partial class PopupWindow : Window
         CancelPendingSearchRefresh();
         EndFileJumpSearchPasteRouting();
         _swallowedMenuAltLatch = false;
+        _swallowedRightAltLatch = false;
         _passthroughModifierLatch = 0;
         _popupPinned = false;
         UpdatePinHeaderUi();

@@ -13,6 +13,8 @@ public partial class PopupWindow : Window
         if (IsMenuAltVk(kb.vkCode) && !_isPhraseEditPopupOpen && !_isTextEntryEditPopupOpen && !_isContextPopupOpen && !_isBatchMenuPopupOpen)
         {
             _swallowedMenuAltLatch = true;
+            if (kb.vkCode == Win32.VK_RMENU)
+                _swallowedRightAltLatch = true;
             if (!_awaitHotkeyAltChordCleanup)
             {
                 _ctxAltAwaitRelease = true;
@@ -43,7 +45,10 @@ public partial class PopupWindow : Window
             return (IntPtr)1;
         }
 
-        if (TryDispatchClipboardItemActionHotkey(kb.vkCode))
+        // Windows 会把 AltGr / 右 Alt 报成 Ctrl+Alt；RAlt+Enter 必须先于默认的
+        // Ctrl+Alt+Enter「粘贴为 JSON 文件」，否则右 Alt 模式永远到不了命令解析器。
+        if (!(kb.vkCode == Win32.VK_RETURN && IsRightAltEffective())
+            && TryDispatchClipboardItemActionHotkey(kb.vkCode))
             return (IntPtr)1;
 
         if (HotkeyChordMatches(_starToggleHotkeyModifiers) && kb.vkCode == _starToggleHotkeyKey)
@@ -78,7 +83,8 @@ public partial class PopupWindow : Window
             ctrlHeld,
             altHeld,
             shiftHeld,
-            IsPanelModifierDown()));
+            IsPanelModifierDown(),
+            IsRightAltEffective()));
 
         if (command.NeedsCharacterTranslation)
         {

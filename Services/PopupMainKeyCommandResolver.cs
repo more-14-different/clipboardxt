@@ -16,6 +16,7 @@ internal static class PopupMainKeyCommandResolver
         PasteByIndex,
         ToggleQuickPhraseFilter,
         TogglePointSelection,
+        OpenSelectedWebUrls,
         CommitSelection,
         MoveSelection,
         MoveSelectionByHjkl,
@@ -34,7 +35,8 @@ internal static class PopupMainKeyCommandResolver
         bool Ctrl,
         bool Alt,
         bool Shift,
-        bool PanelModifier);
+        bool PanelModifier,
+        bool RightAlt = false);
 
     internal readonly record struct Command(
         CommandKind Kind,
@@ -117,7 +119,9 @@ internal static class PopupMainKeyCommandResolver
 
     private static Command ResolveEnter(Context context)
     {
-        return context.Ctrl
+        return context.RightAlt
+            ? new Command(CommandKind.OpenSelectedWebUrls)
+            : context.Ctrl
             ? new Command(CommandKind.TogglePointSelection)
             : new Command(
                 CommandKind.CommitSelection,

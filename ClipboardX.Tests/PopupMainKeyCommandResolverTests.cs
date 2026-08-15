@@ -65,6 +65,20 @@ public sealed class PopupMainKeyCommandResolverTests
         Assert.False(command.SoftLineBreakAfterEachText);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Resolve_RightAltEnterOpensSelectedWebUrls(bool ctrl)
+    {
+        var command = Resolve(ContextFor(
+            Win32.VK_RETURN,
+            ctrl: ctrl,
+            alt: true,
+            rightAlt: true));
+
+        Assert.Equal(CommandKind.OpenSelectedWebUrls, command.Kind);
+    }
+
     [Fact]
     public void Resolve_CtrlAltEnterStillTogglesPointSelection()
     {
@@ -186,6 +200,7 @@ public sealed class PopupMainKeyCommandResolverTests
         bool ctrl = false,
         bool alt = false,
         bool shift = false,
-        bool panelModifier = false) =>
-        new(key, ctrl, alt, shift, panelModifier);
+        bool panelModifier = false,
+        bool rightAlt = false) =>
+        new(key, ctrl, alt, shift, panelModifier, rightAlt);
 }

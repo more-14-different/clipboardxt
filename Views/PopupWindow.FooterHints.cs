@@ -80,6 +80,11 @@ public partial class PopupWindow : Window
             "换行连贴",
             "普通模式多选顺序连贴时，在每条文本末尾附带换行。",
             PanelHintTone.Action);
+        var openUrlHint = new PanelHintItem(
+            "RAlt+Enter",
+            "打开网址",
+            "用默认浏览器打开当前文本中的合法 http/https 网址；多选时按列表顺序过滤并打开。",
+            PanelHintTone.Action);
         var softLinePasteHint = new PanelHintItem(
             "Shift+Enter",
             "软换行连贴",
@@ -102,6 +107,7 @@ public partial class PopupWindow : Window
             PanelHintTone.Manage);
         var manageItems = new List<PanelHintItem>
         {
+            openUrlHint,
             linePasteHint,
             softLinePasteHint,
             favoriteHint,

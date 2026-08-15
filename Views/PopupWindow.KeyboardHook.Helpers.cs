@@ -149,6 +149,9 @@ public partial class PopupWindow : Window
     /// <summary>物理 Alt 或主面板吞 Alt Down 后的锁存（吞键后 GetAsyncKeyState(Alt) 常为假，导致 Alt+/ 误进搜索）。</summary>
     private bool AltEffectiveForRegisteredChord() => AltPhysicallyDown() || _swallowedMenuAltLatch;
 
+    private bool IsRightAltEffective() =>
+        _swallowedRightAltLatch || (Win32.GetAsyncKeyState(Win32.VK_RMENU) & 0x8000) != 0;
+
     /// <summary>
     /// 与 RegisterHotKey 的 fsModifiers 一致；含 <see cref="_swallowedMenuAltLatch"/> 与 AltGr（LCtrl+RAlt）兜底。
     /// </summary>
