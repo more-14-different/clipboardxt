@@ -81,9 +81,9 @@ public partial class PopupWindow : Window
             "普通模式多选顺序连贴时，在每条文本末尾附带换行。",
             PanelHintTone.Action);
         var openUrlHint = new PanelHintItem(
-            "RAlt+Enter",
+            "Alt+Shift+Enter",
             "打开网址",
-            "用默认浏览器打开当前文本中的合法 http/https 网址；多选时按列表顺序过滤并打开。",
+            "打开当前文本中的合法 http/https 网址；来源是浏览器时优先用来源浏览器，否则使用默认浏览器。",
             PanelHintTone.Action);
         var softLinePasteHint = new PanelHintItem(
             "Shift+Enter",

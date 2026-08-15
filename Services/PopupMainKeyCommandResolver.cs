@@ -35,8 +35,7 @@ internal static class PopupMainKeyCommandResolver
         bool Ctrl,
         bool Alt,
         bool Shift,
-        bool PanelModifier,
-        bool RightAlt = false);
+        bool PanelModifier);
 
     internal readonly record struct Command(
         CommandKind Kind,
@@ -119,7 +118,7 @@ internal static class PopupMainKeyCommandResolver
 
     private static Command ResolveEnter(Context context)
     {
-        return context.RightAlt
+        return context.Alt && context.Shift && !context.Ctrl
             ? new Command(CommandKind.OpenSelectedWebUrls)
             : context.Ctrl
             ? new Command(CommandKind.TogglePointSelection)

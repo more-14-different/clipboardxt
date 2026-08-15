@@ -58,25 +58,44 @@ public sealed class PopupMainKeyCommandResolverTests
     [Fact]
     public void Resolve_AltEnterCommitsWithNewline()
     {
-        var command = Resolve(ContextFor(Win32.VK_RETURN, alt: true, shift: true));
+        var command = Resolve(ContextFor(Win32.VK_RETURN, alt: true));
 
         Assert.Equal(CommandKind.CommitSelection, command.Kind);
         Assert.True(command.NewlineAfterEachText);
         Assert.False(command.SoftLineBreakAfterEachText);
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void Resolve_RightAltEnterOpensSelectedWebUrls(bool ctrl)
+    [Fact]
+    public void Resolve_AltShiftEnterOpensSelectedWebUrls()
     {
         var command = Resolve(ContextFor(
             Win32.VK_RETURN,
-            ctrl: ctrl,
             alt: true,
-            rightAlt: true));
+            shift: true,
+            panelModifier: false));
 
         Assert.Equal(CommandKind.OpenSelectedWebUrls, command.Kind);
+    }
+
+    [Fact]
+    public void Resolve_ShiftEnterRetainsSoftLineBreakPaste()
+    {
+        var command = Resolve(ContextFor(Win32.VK_RETURN, shift: true));
+
+        Assert.Equal(CommandKind.CommitSelection, command.Kind);
+        Assert.True(command.SoftLineBreakAfterEachText);
+    }
+
+    [Fact]
+    public void Resolve_CtrlAltShiftEnterRetainsCtrlCommand()
+    {
+        var command = Resolve(ContextFor(
+            Win32.VK_RETURN,
+            ctrl: true,
+            alt: true,
+            shift: true));
+
+        Assert.Equal(CommandKind.TogglePointSelection, command.Kind);
     }
 
     [Fact]
@@ -200,7 +219,6 @@ public sealed class PopupMainKeyCommandResolverTests
         bool ctrl = false,
         bool alt = false,
         bool shift = false,
-        bool panelModifier = false,
-        bool rightAlt = false) =>
-        new(key, ctrl, alt, shift, panelModifier, rightAlt);
+        bool panelModifier = false) =>
+        new(key, ctrl, alt, shift, panelModifier);
 }

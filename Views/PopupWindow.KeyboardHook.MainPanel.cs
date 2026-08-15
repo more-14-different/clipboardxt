@@ -13,8 +13,6 @@ public partial class PopupWindow : Window
         if (IsMenuAltVk(kb.vkCode) && !_isPhraseEditPopupOpen && !_isTextEntryEditPopupOpen && !_isContextPopupOpen && !_isBatchMenuPopupOpen)
         {
             _swallowedMenuAltLatch = true;
-            if (kb.vkCode == Win32.VK_RMENU)
-                _swallowedRightAltLatch = true;
             if (!_awaitHotkeyAltChordCleanup)
             {
                 _ctxAltAwaitRelease = true;
@@ -33,6 +31,25 @@ public partial class PopupWindow : Window
             or 0x5B or 0x5C)
             return Win32.CallNextHookEx(_keyboardHook, nCode, wParam, lParam);
 
+        bool ctrlHeld = IsPhysicalCtrlDown();
+        bool altHeld = AltEffectiveForRegisteredChord();
+        bool shiftHeld = IsPhysicalShiftDown();
+
+        // Alt+Shift+Enter 原先只是 Alt+Enter「换行连贴」的重复入口；现在将这个精确组合
+        // 保留为独立的 URL 后处理模式，并优先于用户可配置的条目动作。
+        if (kb.vkCode == Win32.VK_RETURN && altHeld && shiftHeld && !ctrlHeld)
+        {
+            var openUrlsCommand = PopupMainKeyCommandResolver.Resolve(
+                new PopupMainKeyCommandResolver.Context(
+                    kb.vkCode,
+                    ctrlHeld,
+                    altHeld,
+                    shiftHeld,
+                    IsPanelModifierDown()));
+            Dispatcher.BeginInvoke(() => ApplyMainKeyCommand(openUrlsCommand));
+            return (IntPtr)1;
+        }
+
         if (HotkeyChordMatches(_panelPageScrollUpModifiers) && kb.vkCode == _panelPageScrollUpKey)
         {
             Dispatcher.BeginInvoke(() => ScrollPage(-1));
@@ -45,10 +62,7 @@ public partial class PopupWindow : Window
             return (IntPtr)1;
         }
 
-        // Windows 会把 AltGr / 右 Alt 报成 Ctrl+Alt；RAlt+Enter 必须先于默认的
-        // Ctrl+Alt+Enter「粘贴为 JSON 文件」，否则右 Alt 模式永远到不了命令解析器。
-        if (!(kb.vkCode == Win32.VK_RETURN && IsRightAltEffective())
-            && TryDispatchClipboardItemActionHotkey(kb.vkCode))
+        if (TryDispatchClipboardItemActionHotkey(kb.vkCode))
             return (IntPtr)1;
 
         if (HotkeyChordMatches(_starToggleHotkeyModifiers) && kb.vkCode == _starToggleHotkeyKey)
@@ -63,10 +77,6 @@ public partial class PopupWindow : Window
 
         if (KeyPassthroughHelper.ShouldPassthrough(_appSettings, kb.vkCode, true, _passthroughModifierLatch))
             return Win32.CallNextHookEx(_keyboardHook, nCode, wParam, lParam);
-
-        bool ctrlHeld = IsPhysicalCtrlDown();
-        bool altHeld = AltEffectiveForRegisteredChord();
-        bool shiftHeld = IsPhysicalShiftDown();
 
         // WH_KEYBOARD_LL 在 GlobalHookDispatcher 后台线程执行，不能读取 WPF Popup.IsOpen。
         // _previewImageFiles 仅在预览打开时赋值、关闭时清空，可作为线程安全的导航状态快照。
@@ -83,8 +93,7 @@ public partial class PopupWindow : Window
             ctrlHeld,
             altHeld,
             shiftHeld,
-            IsPanelModifierDown(),
-            IsRightAltEffective()));
+            IsPanelModifierDown()));
 
         if (command.NeedsCharacterTranslation)
         {
@@ -124,4 +133,5 @@ public partial class PopupWindow : Window
         (Win32.GetAsyncKeyState(0x10) & 0x8000) != 0
         || (Win32.GetAsyncKeyState(0xA0) & 0x8000) != 0
         || (Win32.GetAsyncKeyState(0xA1) & 0x8000) != 0;
+
 }
