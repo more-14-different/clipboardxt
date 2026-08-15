@@ -646,6 +646,60 @@
                                 <TextBlock x:Name="CtxPasteHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
+                        <Border x:Name="CtxLinePasteBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
+                                Visibility="Collapsed"
+                                MouseLeftButtonUp="CtxLinePaste_Click">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid MinWidth="300">
+                                <TextBlock Text="↵ 逐项换行粘贴" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Text="Alt+Enter" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                            </Grid>
+                        </Border>
+                        <Border x:Name="CtxSoftLinePasteBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
+                                Visibility="Collapsed"
+                                MouseLeftButtonUp="CtxSoftLinePaste_Click">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid MinWidth="300">
+                                <TextBlock Text="↲ 逐项软换行粘贴" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Text="Shift+Enter" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                            </Grid>
+                        </Border>
+                        <Border x:Name="CtxOpenUrlsBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
+                                Visibility="Collapsed"
+                                MouseLeftButtonUp="CtxOpenUrls_Click">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid MinWidth="300">
+                                <TextBlock Text="🌐 打开所选网址" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Text="Alt+Shift+Enter" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                            </Grid>
+                        </Border>
                         <Border x:Name="CtxPasteAsFileBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
                                 Visibility="Collapsed"
                                 MouseLeftButtonUp="CtxPasteAsFile_Click">

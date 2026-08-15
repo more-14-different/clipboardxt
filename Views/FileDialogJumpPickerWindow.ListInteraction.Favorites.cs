@@ -15,6 +15,16 @@ public partial class FileDialogJumpPickerWindow : Window
     private void JumpRowContextMenu_Opened(object sender, RoutedEventArgs e)
     {
         var row = ItemsList.SelectedItem as FileJumpPickerRow;
+        CtxCommitSelection.IsEnabled = row != null;
+        CtxTransferPath.IsEnabled = row != null;
+        CtxCommitSelection.Header = UiLanguage.T(
+            _isStandaloneMode
+                ? "📂 打开文件夹"
+                : _autoForegroundStickyMode
+                    ? "📂 切换目录"
+                    : "📂 跳转到目录");
+        CtxTransferPath.Header = UiLanguage.T(
+            _isStandaloneMode ? "📋 粘贴路径" : "📋 复制路径");
         CtxAddFavorite.Visibility = row is { IsFavorite: false } ? Visibility.Visible : Visibility.Collapsed;
         CtxRemoveFavorite.Visibility = row is { IsFavorite: true } ? Visibility.Visible : Visibility.Collapsed;
         CtxEditPhrase.Visibility = row is { IsFavorite: true } ? Visibility.Visible : Visibility.Collapsed;
@@ -23,6 +33,20 @@ public partial class FileDialogJumpPickerWindow : Window
         CtxRemoveFavorite.InputGestureText = _settings.FileJumpFavoriteHotkeyDisplayName;
         CtxEditPhrase.InputGestureText = _settings.FileJumpEditPhraseHotkeyDisplayName;
         CtxRemoveRecentFolder.InputGestureText = _settings.FileJumpRemoveRecentHotkeyDisplayName;
+    }
+
+    private void CtxCommitSelection_Click(object sender, RoutedEventArgs e)
+    {
+        FlushPendingSearchRefresh();
+        if (ItemsList.SelectedItem is FileJumpPickerRow row)
+            CommitSelection(row.Path);
+    }
+
+    private void CtxTransferPath_Click(object sender, RoutedEventArgs e)
+    {
+        FlushPendingSearchRefresh();
+        if (ItemsList.SelectedItem is FileJumpPickerRow row)
+            CommitSelection(row.Path, pasteText: true);
     }
 
     private void CtxAddFavorite_Click(object sender, RoutedEventArgs e)

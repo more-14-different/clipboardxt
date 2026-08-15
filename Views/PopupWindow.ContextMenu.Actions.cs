@@ -117,10 +117,28 @@ public partial class PopupWindow : Window
     {
         CloseContextMenuPopup();
         if (_contextEntry != null)
-        {
-            ItemsList.SelectedItem = _contextEntry;
-            PasteSelectedItem();
-        }
+            HandleMainEnterKey();
+    }
+
+    private void ActivateCtxLinePaste()
+    {
+        CloseContextMenuPopup();
+        if (_contextEntry != null)
+            HandleMainEnterKey(newlineAfterEachTextWhenAltEnter: true);
+    }
+
+    private void ActivateCtxSoftLinePaste()
+    {
+        CloseContextMenuPopup();
+        if (_contextEntry != null)
+            HandleMainEnterKey(softLineBreakAfterEachTextWhenShiftEnter: true);
+    }
+
+    private void ActivateCtxOpenUrls()
+    {
+        CloseContextMenuPopup();
+        if (_contextEntry != null)
+            OpenSelectedWebUrls();
     }
 
     private void ActivateCtxPasteAsFile()

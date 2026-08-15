@@ -34,11 +34,24 @@ public partial class PopupWindow : Window
             ItemsList.SelectedItems.Clear();
             ItemsList.SelectedItems.Add(entry);
         }
+        var selectedEntries = ItemsList.SelectedItems.Cast<ClipboardEntry>()
+            .Where(selected => _displayItems.Contains(selected))
+            .OrderBy(selected => _displayItems.IndexOf(selected))
+            .ToList();
+        var policy = ClipboardContextMenuPolicy.Evaluate(selectedEntries, GetBatchMode());
         CtxStarText.Text = entry.IsStarred ? "☆ 取消收藏" : "★ 收藏";
         CtxStarBorder.Visibility = entry.IsQuickPaste ? Visibility.Collapsed : Visibility.Visible;
         CtxShortcutText.Text = !string.IsNullOrWhiteSpace(entry.ShortcutPhrase) ? "⚡ 修改快捷短语" : "⚡ 设为快捷短语";
-        CtxPasteAsFileBorder.Visibility = ItemsList.SelectedItems.Cast<ClipboardEntry>()
-            .Any(ClipboardFileExportPlanner.CanExport)
+        CtxLinePasteBorder.Visibility = policy.ShowLinePaste
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CtxSoftLinePasteBorder.Visibility = policy.ShowSoftLinePaste
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CtxOpenUrlsBorder.Visibility = policy.ShowOpenUrls
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        CtxPasteAsFileBorder.Visibility = policy.ShowPasteAsFile
             ? Visibility.Visible
             : Visibility.Collapsed;
         CtxPasteJsonFileBorder.Visibility = entry.Type == EntryType.Text && IsWellFormedJson(entry.TextContent)

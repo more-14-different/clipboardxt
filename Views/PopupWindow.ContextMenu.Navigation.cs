@@ -66,6 +66,9 @@ public partial class PopupWindow : Window
         }
 
         Add(CtxPasteBorder, ActivateCtxPaste);
+        Add(CtxLinePasteBorder, ActivateCtxLinePaste);
+        Add(CtxSoftLinePasteBorder, ActivateCtxSoftLinePaste);
+        Add(CtxOpenUrlsBorder, ActivateCtxOpenUrls);
         Add(CtxPasteAsFileBorder, ActivateCtxPasteAsFile);
         Add(CtxPasteJsonFileBorder, ActivateCtxPasteJsonFile);
         Add(CtxEditTextBorder, ActivateCtxEditText);

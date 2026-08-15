@@ -71,7 +71,16 @@
                          Padding="4"
                          MaxHeight="340"
                          PreviewMouseLeftButtonUp="ResultsList_OnPreviewMouseLeftButtonUp"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                         PreviewMouseRightButtonUp="ResultsList_OnPreviewMouseRightButtonUp"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ContextMenu>
+                        <ContextMenu x:Name="ResultContextMenu" Placement="MousePoint"
+                                     Opened="ResultContextMenu_Opened">
+                            <MenuItem x:Name="CtxActivateResult" Header="在资源管理器中定位"
+                                      InputGestureText="Enter" Click="CtxActivateResult_Click"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
 
                 <!-- 底栏提示 -->
                 <Border Grid.Row="4" Padding="14,7" Background="{DynamicResource FooterBrush}"

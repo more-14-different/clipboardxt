@@ -28,6 +28,12 @@ public partial class PopupWindow : Window
 {
     private void CtxPaste_Click(object sender, MouseButtonEventArgs e) => ActivateCtxPaste();
 
+    private void CtxLinePaste_Click(object sender, MouseButtonEventArgs e) => ActivateCtxLinePaste();
+
+    private void CtxSoftLinePaste_Click(object sender, MouseButtonEventArgs e) => ActivateCtxSoftLinePaste();
+
+    private void CtxOpenUrls_Click(object sender, MouseButtonEventArgs e) => ActivateCtxOpenUrls();
+
     private void CtxPasteAsFile_Click(object sender, MouseButtonEventArgs e) => ActivateCtxPasteAsFile();
 
     private void CtxPasteJsonFile_Click(object sender, MouseButtonEventArgs e) => ActivateCtxPasteJsonFile();

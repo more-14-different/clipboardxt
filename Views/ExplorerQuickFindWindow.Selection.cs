@@ -59,4 +59,50 @@ public partial class ExplorerQuickFindWindow : Window
         if (!string.IsNullOrEmpty(path))
             ItemActivated?.Invoke(path!);
     }
+
+    private void ResultsList_OnPreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (FindResultListBoxItem(e.OriginalSource as DependencyObject) is { } item)
+        {
+            ResultsList.SelectedItem = item;
+            e.Handled = true;
+            ResultContextMenu.PlacementTarget = item;
+            ResultContextMenu.IsOpen = true;
+        }
+    }
+
+    private static ListBoxItem? FindResultListBoxItem(DependencyObject? start)
+    {
+        var element = start;
+        while (element != null && element is not ListBoxItem)
+        {
+            DependencyObject? parent = null;
+            if (element is Visual or System.Windows.Media.Media3D.Visual3D)
+            {
+                try { parent = VisualTreeHelper.GetParent(element); }
+                catch { parent = null; }
+            }
+
+            parent ??= LogicalTreeHelper.GetParent(element);
+            element = parent;
+        }
+
+        return element as ListBoxItem;
+    }
+
+    private void ResultContextMenu_Opened(object sender, RoutedEventArgs e)
+    {
+        CtxActivateResult.IsEnabled = !string.IsNullOrEmpty(GetSelectedFullPath());
+        CtxActivateResult.Header = UiLanguage.T(
+            _settings?.ExplorerQuickFindOpenMode == "DirectOpen"
+                ? "↗ 直接打开"
+                : "⌖ 在资源管理器中定位");
+    }
+
+    private void CtxActivateResult_Click(object sender, RoutedEventArgs e)
+    {
+        var path = GetSelectedFullPath();
+        if (!string.IsNullOrEmpty(path))
+            ItemActivated?.Invoke(path);
+    }
 }

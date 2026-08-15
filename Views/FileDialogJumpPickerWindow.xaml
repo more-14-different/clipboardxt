@@ -121,6 +121,11 @@
                          PreviewMouseRightButtonUp="ItemsList_PreviewMouseRightButtonUp">
                     <ListBox.ContextMenu>
                         <ContextMenu x:Name="JumpRowContextMenu" Opened="JumpRowContextMenu_Opened">
+                            <MenuItem x:Name="CtxCommitSelection" Header="打开" InputGestureText="Enter"
+                                      Click="CtxCommitSelection_Click"/>
+                            <MenuItem x:Name="CtxTransferPath" Header="粘贴路径" InputGestureText="Ctrl+Enter"
+                                      Click="CtxTransferPath_Click"/>
+                            <Separator/>
                             <MenuItem x:Name="CtxAddFavorite" Header="⭐ 加入收藏" Click="CtxAddFavorite_Click"/>
                             <MenuItem x:Name="CtxRemoveFavorite" Header="移除收藏" Click="CtxRemoveFavorite_Click"/>
                             <MenuItem x:Name="CtxEditPhrase" Header="✎ 修改关键词…" Click="CtxEditPhrase_Click"/>
