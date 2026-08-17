@@ -119,8 +119,8 @@
                             <Setter Property="Opacity" Value="1"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding IsWebUrl}" Value="True">
-                            <Setter Property="Background" Value="#172B46"/>
-                            <Setter Property="BorderBrush" Value="#315F8B"/>
+                            <Setter Property="Background" Value="#3B211D"/>
+                            <Setter Property="BorderBrush" Value="#E07A5F"/>
                             <Setter Property="Opacity" Value="1"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -142,7 +142,7 @@
                                 <Setter Property="NormalForegroundOverride" Value="#C7D8D0"/>
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsWebUrl}" Value="True">
-                                <Setter Property="NormalForegroundOverride" Value="#8CC8FF"/>
+                                <Setter Property="NormalForegroundOverride" Value="#FFE2D8"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

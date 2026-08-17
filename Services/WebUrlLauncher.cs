@@ -6,8 +6,8 @@ namespace ClipboardManager;
 
 internal static class WebUrlLauncher
 {
-    internal const string MetadataLabel = "网址 · Alt+Shift+Enter";
-    internal const string MetadataSearchText = "网址 URL Alt+Shift+Enter";
+    internal static string MetadataLabel => UiLanguage.IsEnglish ? "URL" : "网址";
+    internal const string MetadataSearchText = "网址 URL";
 
     private static readonly HashSet<string> KnownBrowserExecutables = new(
         [
@@ -125,8 +125,7 @@ internal static class WebUrlLauncher
 
     internal static bool IsMetadataSearchToken(string token) =>
         token.Equals("网址", StringComparison.OrdinalIgnoreCase)
-        || token.Equals("URL", StringComparison.OrdinalIgnoreCase)
-        || token.Equals("Alt+Shift+Enter", StringComparison.OrdinalIgnoreCase);
+        || token.Equals("URL", StringComparison.OrdinalIgnoreCase);
 
     internal static bool TryResolveSourceBrowser(
         ClipboardSourceInfo? source,

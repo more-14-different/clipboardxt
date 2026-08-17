@@ -50,7 +50,6 @@ public sealed class ClipboardEntrySearchTests
     [Theory]
     [InlineData("网址")]
     [InlineData("URL")]
-    [InlineData("Alt+Shift+Enter")]
     public void MatchesSearch_FindsDerivedWebUrlMetadata(string query)
     {
         var entry = new ClipboardEntry

@@ -117,7 +117,6 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
     [Theory]
     [InlineData("网址")]
     [InlineData("URL")]
-    [InlineData("Alt+Shift+Enter")]
     public void Search_FindsExistingWebUrlsByDerivedMetadata(string query)
     {
         var store = CreateStore();
