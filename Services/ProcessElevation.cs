@@ -10,6 +10,12 @@ namespace ClipboardManager;
 /// </summary>
 public static class ProcessElevation
 {
+    internal static bool ShouldRequestElevation(
+        bool runAsAdministrator,
+        bool isCurrentProcessElevated,
+        bool isFolderFavoriteCommand) =>
+        runAsAdministrator && !isCurrentProcessElevated && !isFolderFavoriteCommand;
+
     public static bool IsCurrentProcessElevated()
     {
         using var identity = WindowsIdentity.GetCurrent();

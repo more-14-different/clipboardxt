@@ -10,7 +10,7 @@ internal static class FolderFavoriteCommand
     private const string ExistingResponse = "exists";
     private const string InvalidResponse = "invalid";
 
-    internal static string PipeName => AppPaths.MutexName + "_FolderFavorite_v1";
+    internal static string PipeName => AppPaths.MutexName + "_FolderFavorite_v2";
 
     internal static bool IsRequested(IReadOnlyList<string> args) =>
         args.Any(arg => string.Equals(arg, AddArgument, StringComparison.OrdinalIgnoreCase));
@@ -57,7 +57,7 @@ internal static class FolderFavoriteCommand
         {
             using var timeout = new CancellationTokenSource(timeoutMilliseconds);
             using var client = new NamedPipeClientStream(
-                ".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+                ".", PipeName, PipeDirection.InOut, FolderFavoritePipeFactory.ClientOptions);
             client.ConnectAsync(timeoutMilliseconds, timeout.Token).GetAwaiter().GetResult();
             using var writer = new StreamWriter(client, leaveOpen: true) { AutoFlush = true };
             using var reader = new StreamReader(client, leaveOpen: true);
@@ -144,12 +144,7 @@ internal sealed class FolderFavoriteCommandServer : IDisposable
         {
             try
             {
-                await using var server = new NamedPipeServerStream(
-                    FolderFavoriteCommand.PipeName,
-                    PipeDirection.InOut,
-                    1,
-                    PipeTransmissionMode.Byte,
-                    PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+                await using var server = FolderFavoritePipeFactory.CreateServer();
                 await server.WaitForConnectionAsync(_stop.Token).ConfigureAwait(false);
                 using var reader = new StreamReader(server, leaveOpen: true);
                 await using var writer = new StreamWriter(server, leaveOpen: true) { AutoFlush = true };

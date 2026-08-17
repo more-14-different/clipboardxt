@@ -5,6 +5,23 @@ namespace ClipboardX.Tests;
 
 public sealed class FolderFavoriteCommandTests
 {
+    [Theory]
+    [InlineData(true, false, false, true)]
+    [InlineData(true, false, true, false)]
+    [InlineData(true, true, false, false)]
+    [InlineData(false, false, false, false)]
+    public void ShouldRequestElevation_NeverElevatesFolderFavoriteCommand(
+        bool runAsAdministrator,
+        bool isElevated,
+        bool isFolderFavoriteCommand,
+        bool expected)
+    {
+        Assert.Equal(expected, ProcessElevation.ShouldRequestElevation(
+            runAsAdministrator,
+            isElevated,
+            isFolderFavoriteCommand));
+    }
+
     [Fact]
     public void TryParse_AcceptsExistingDirectory()
     {

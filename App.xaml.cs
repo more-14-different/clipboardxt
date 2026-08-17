@@ -113,21 +113,46 @@ public partial class App : Application
         {
             if (!FolderFavoriteCommand.TryParse(e.Args, out requestedFavoritePath))
             {
-                Shutdown(2);
+                ShutdownFolderFavoriteCommand(2);
                 return;
             }
 
             if (FolderFavoriteCommand.TrySendToRunningInstance(requestedFavoritePath))
             {
-                Shutdown(0);
+                ShutdownFolderFavoriteCommand(0);
                 return;
             }
+
+            using var commandMutex = new Mutex(true, AppPaths.MutexName, out var isNewForCommand);
+            if (!isNewForCommand)
+            {
+                var sent = FolderFavoriteCommand.TrySendToRunningInstance(
+                    requestedFavoritePath, timeoutMilliseconds: 1800);
+                ShutdownFolderFavoriteCommand(sent ? 0 : 3);
+                return;
+            }
+
+            bool added;
+            try
+            {
+                _settings = AppSettings.Load();
+                added = FolderFavoriteCommand.TryAdd(_settings, requestedFavoritePath, out _);
+            }
+            finally
+            {
+                commandMutex.ReleaseMutex();
+            }
+            ShutdownFolderFavoriteCommand(added ? 0 : 2);
+            return;
         }
 
         _settings = AppSettings.Load();
         UiLanguage.Initialize(_settings.UiLanguage);
 
-        if (_settings.RunAsAdministrator && !ProcessElevation.IsCurrentProcessElevated())
+        if (ProcessElevation.ShouldRequestElevation(
+                _settings.RunAsAdministrator,
+                ProcessElevation.IsCurrentProcessElevated(),
+                addFolderFavoriteRequested))
         {
             if (ProcessElevation.TryStartElevatedCopyAndExit(e.Args))
             {
@@ -139,26 +164,12 @@ public partial class App : Application
         _mutex = new Mutex(true, AppPaths.MutexName, out bool isNew);
         if (!isNew)
         {
-            if (requestedFavoritePath != null)
-            {
-                var sent = FolderFavoriteCommand.TrySendToRunningInstance(
-                    requestedFavoritePath, timeoutMilliseconds: 1800);
-                Shutdown(sent ? 0 : 3);
-                return;
-            }
 #if DEBUG
             try { Console.WriteLine("ClipboardX 已在运行中（互斥锁），本进程将退出。请查看托盘或结束旧进程。"); } catch { }
 #endif
             LocalizedMessageBox.Show("ClipboardX 已在运行中", "提示",
                 MessageBoxButton.OK, MessageBoxImage.Information);
             Shutdown();
-            return;
-        }
-
-        if (requestedFavoritePath != null
-            && !FolderFavoriteCommand.TryAdd(_settings, requestedFavoritePath, out _))
-        {
-            Shutdown(2);
             return;
         }
 
@@ -236,6 +247,12 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        if (_folderFavoriteCommandOnly)
+        {
+            base.OnExit(e);
+            return;
+        }
+
         _folderFavoriteCommandServer?.Dispose();
         _folderFavoriteCommandServer = null;
         AppSettings.FlushPendingSave();

@@ -46,6 +46,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
     <PackageReference Include="NPinyin.Core" Version="3.0.0" />
     <PackageReference Include="Svg" Version="3.4.7" />
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
   </ItemGroup>
 
   <!-- tools/ 内为独立小工具，勿随主工程一并编译 -->

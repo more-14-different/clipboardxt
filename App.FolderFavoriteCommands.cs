@@ -3,6 +3,13 @@ namespace ClipboardManager;
 public partial class App
 {
     private FolderFavoriteCommandServer? _folderFavoriteCommandServer;
+    private bool _folderFavoriteCommandOnly;
+
+    private void ShutdownFolderFavoriteCommand(int exitCode)
+    {
+        _folderFavoriteCommandOnly = true;
+        Shutdown(exitCode);
+    }
 
     private void StartFolderFavoriteCommandServer()
     {
