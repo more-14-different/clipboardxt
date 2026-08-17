@@ -205,7 +205,7 @@ internal static partial class EnglishTranslations
         ["数字直达"] = "Jump by Number",
         ["搜索"] = "Search",
         ["搜索光标"] = "Search Caret",
-        ["搜索剪贴板内容；空格分词按 AND 匹配，也可检索来源与快捷短语。"] = "Search clipboard content. Space-separated terms use AND matching; sources and quick phrases are searchable too.",
+        ["搜索剪贴板内容；空格分词按 AND 匹配，也可检索来源、快捷短语与网址标签。"] = "Search clipboard content. Space-separated terms use AND matching; sources, quick phrases, and web URL tags are searchable too.",
         ["搜索进程名…"] = "Search process names…",
         ["搜索路径、关键词和来源；Everything 补充结果不支持拼音。"] = "Search paths, keywords, and sources. Supplemental Everything results do not support Pinyin.",
         ["缩小结果范围，并查看条目完整内容。"] = "Narrow the results and inspect an item's full content.",

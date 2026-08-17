@@ -8,7 +8,8 @@ internal sealed partial class ClipboardHistoryStore
     private static bool CanSearchArchived(SearchQuerySpec spec) =>
         !spec.IsEmpty
         && spec.BroadTokens.Length > 0
-        && spec.BroadTokens.All(token => token.Length >= 3);
+        && spec.BroadTokens.All(token =>
+            token.Length >= 3 || WebUrlLauncher.IsMetadataSearchToken(token));
 
     private static List<ClipboardEntry> SearchArchived(
         SqliteConnection conn,
@@ -147,7 +148,11 @@ internal sealed partial class ClipboardHistoryStore
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
-            if (spec.BroadTokens[i].Length >= 3)
+            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i]))
+            {
+                whereClauses.Add(BuildWebUrlCandidateClause());
+            }
+            else if (spec.BroadTokens[i].Length >= 3)
             {
                 whereClauses.Add($"c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i})");
             }

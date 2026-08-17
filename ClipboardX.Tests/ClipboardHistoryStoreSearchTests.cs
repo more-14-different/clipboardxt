@@ -114,6 +114,56 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
         Assert.Equal("deploy-production", entry.ShortcutPhrase);
     }
 
+    [Theory]
+    [InlineData("网址")]
+    [InlineData("URL")]
+    [InlineData("Alt+Shift+Enter")]
+    public void Search_FindsExistingWebUrlsByDerivedMetadata(string query)
+    {
+        var store = CreateStore();
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "https://example.com/existing",
+            CopiedAt = DateTime.Now
+        }));
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "https://example.com/path with space",
+            CopiedAt = DateTime.Now.AddSeconds(-1)
+        }));
+
+        var entry = Assert.Single(store.Search(query, null, 10));
+
+        Assert.Equal("https://example.com/existing", entry.TextContent);
+        Assert.True(entry.IsWebUrl);
+    }
+
+    [Fact]
+    public void Search_FindsArchivedWebUrlByDerivedMetadata()
+    {
+        var store = CreateStore();
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "https://example.com/archived",
+            CopiedAt = DateTime.Now.AddHours(-2)
+        }));
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "newest ordinary text",
+            CopiedAt = DateTime.Now
+        }));
+        store.ArchiveExcess(1);
+
+        var entry = Assert.Single(store.Search("网址", null, 10));
+
+        Assert.True(entry.IsArchived);
+        Assert.True(entry.IsWebUrl);
+    }
+
     [Fact]
     public void Search_AnchorVerificationContinuesPastFormerCandidateCap()
     {

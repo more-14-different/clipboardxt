@@ -9,7 +9,11 @@ namespace ClipboardManager;
 
 public enum EntryType { Text, Image, Files }
 
-public sealed record SearchMetadataChip(string Text, bool IsMatch, bool IsSpecial = false);
+public sealed record SearchMetadataChip(
+    string Text,
+    bool IsMatch,
+    bool IsSpecial = false,
+    bool IsWebUrl = false);
 
 public partial class ClipboardEntry : INotifyPropertyChanged
 {

@@ -26,6 +26,13 @@ public partial class ClipboardEntry
     public SearchMetadataChip? ShortcutPhraseMetadataChip =>
         string.IsNullOrWhiteSpace(ShortcutPhrase) ? null : new SearchMetadataChip(ShortcutPhrase, false);
 
+    /// <summary>
+    /// 合法的单条 http/https 文本可由 Alt+Shift+Enter 直接打开。
+    /// 该标记由文本实时派生，因此旧记录、新记录和编辑后的记录无需迁移即可保持一致。
+    /// </summary>
+    public bool IsWebUrl =>
+        Type == EntryType.Text && WebUrlLauncher.TryNormalize(TextContent, out _);
+
     public string[] SourceMetadataDisplayParts
     {
         get
@@ -69,8 +76,10 @@ public partial class ClipboardEntry
     {
         get
         {
+            var metadata = IsWebUrl ? WebUrlLauncher.MetadataSearchText : "";
             var source = SourceSearchText;
-            return string.IsNullOrWhiteSpace(source) ? SearchableText : $"{SearchableText} {source}";
+            return string.Join(" ", new[] { SearchableText, metadata, source }
+                .Where(part => !string.IsNullOrWhiteSpace(part)));
         }
     }
 

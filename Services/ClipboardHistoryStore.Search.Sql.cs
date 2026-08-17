@@ -72,7 +72,11 @@ internal sealed partial class ClipboardHistoryStore
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
-            if (spec.BroadTokens[i].Length >= 3)
+            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i]))
+            {
+                whereClauses.Add(BuildWebUrlCandidateClause());
+            }
+            else if (spec.BroadTokens[i].Length >= 3)
             {
                 whereClauses.Add(
                     $"c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i})");
@@ -100,6 +104,8 @@ internal sealed partial class ClipboardHistoryStore
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
             var token = spec.BroadTokens[i];
+            if (WebUrlLauncher.IsMetadataSearchToken(token))
+                continue;
             if (token.Length >= 3)
                 cmd.Parameters.AddWithValue($"@q{i}", $"\"{token.Replace("\"", "\"\"")}\"");
             else
@@ -115,6 +121,11 @@ internal sealed partial class ClipboardHistoryStore
         return $"(c.entry_type = {(int)EntryType.Image} OR " +
                $"(c.entry_type = {(int)EntryType.Files} AND ({string.Join(" OR ", fileClauses)})))";
     }
+
+    // SQLite 先做廉价前缀筛选，随后仍由 WebUrlLauncher.TryNormalize 严格复核。
+    private static string BuildWebUrlCandidateClause() =>
+        $"(c.entry_type = {(int)EntryType.Text} AND " +
+        "(lower(trim(c.text_content)) LIKE 'http://%' OR lower(trim(c.text_content)) LIKE 'https://%'))";
 
     private static string EscapeLikePattern(string value) =>
         value.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_");

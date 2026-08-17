@@ -45,7 +45,7 @@ public partial class PopupWindow : Window
         var searchHint = new PanelHintItem(
             "输入 / 空格",
             "搜索",
-            "搜索剪贴板内容；空格分词按 AND 匹配，也可检索来源与快捷短语。",
+            "搜索剪贴板内容；空格分词按 AND 匹配，也可检索来源、快捷短语与网址标签。",
             PanelHintTone.Search);
 
         var moveHint = new PanelHintItem("↑↓ / Ctrl+HJKL", "选择", "移动当前焦点；已点选的多选项会继续保留。", PanelHintTone.Navigation);

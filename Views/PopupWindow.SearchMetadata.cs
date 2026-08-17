@@ -35,6 +35,14 @@ public partial class PopupWindow : Window
     private static SearchMetadataChip[]? BuildSearchMetadataPreviewChips(ClipboardEntry item, SearchQuerySpec spec)
     {
         var chips = new List<SearchMetadataChip>();
+        if (item.IsWebUrl)
+        {
+            chips.Add(new SearchMetadataChip(
+                WebUrlLauncher.MetadataLabel,
+                !spec.IsEmpty && SourceMetadataPartMatchesQuery(WebUrlLauncher.MetadataSearchText, spec),
+                IsWebUrl: true));
+        }
+
         if (!string.IsNullOrWhiteSpace(item.ShortcutPhrase))
             chips.Add(new SearchMetadataChip(item.ShortcutPhrase, !spec.IsEmpty && SourceMetadataPartMatchesQuery(item.ShortcutPhrase, spec)));
 

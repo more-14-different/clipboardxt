@@ -48,6 +48,35 @@ public sealed class ClipboardEntrySearchTests
     }
 
     [Theory]
+    [InlineData("网址")]
+    [InlineData("URL")]
+    [InlineData("Alt+Shift+Enter")]
+    public void MatchesSearch_FindsDerivedWebUrlMetadata(string query)
+    {
+        var entry = new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "https://example.com/path",
+        };
+
+        Assert.True(entry.IsWebUrl);
+        Assert.True(entry.MatchesSearch(query));
+    }
+
+    [Fact]
+    public void IsWebUrl_RejectsTextThatMerelyContainsAUrl()
+    {
+        var entry = new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "Open https://example.com/path",
+        };
+
+        Assert.False(entry.IsWebUrl);
+        Assert.False(entry.MatchesSearch("网址"));
+    }
+
+    [Theory]
     [InlineData("快捷短语")]
     [InlineData("标题")]
     [InlineData("路径")]
