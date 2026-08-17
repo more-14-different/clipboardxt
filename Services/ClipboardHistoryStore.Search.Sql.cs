@@ -55,20 +55,10 @@ internal sealed partial class ClipboardHistoryStore
     private static void AddSearchTokenClauses(SearchQuerySpec spec, List<string> whereClauses)
     {
         if (spec.AnchorStart && !string.IsNullOrWhiteSpace(spec.StartNeedle))
-        {
-            whereClauses.Add(
-                "(c.text_content LIKE @likeQStart ESCAPE '\\' " +
-                "OR c.file_paths_json LIKE @likeQStart ESCAPE '\\' " +
-                "OR c.shortcut_phrase LIKE @likeQStart ESCAPE '\\')");
-        }
+            whereClauses.Add(BuildHotValueLikeClause("@likeQStart", includePinyin: false));
 
         if (spec.AnchorEnd && !string.IsNullOrWhiteSpace(spec.EndNeedle))
-        {
-            whereClauses.Add(
-                "(c.text_content LIKE @likeQEnd ESCAPE '\\' " +
-                "OR c.file_paths_json LIKE @likeQEnd ESCAPE '\\' " +
-                "OR c.shortcut_phrase LIKE @likeQEnd ESCAPE '\\')");
-        }
+            whereClauses.Add(BuildHotValueLikeClause("@likeQEnd", includePinyin: false));
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
@@ -76,27 +66,20 @@ internal sealed partial class ClipboardHistoryStore
             {
                 whereClauses.Add(spec.BroadTokens[i].Length >= 3
                     ? $"({BuildWebUrlCandidateClause()} OR " +
-                      $"c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i}))"
+                      $"c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i}) OR " +
+                      $"{BuildHotValueLikeClause($"@likeQ{i}", includePinyin: true)})"
                     : $"({BuildWebUrlCandidateClause()} OR " +
-                      $"c.text_content LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.shortcut_phrase LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.source_search_text LIKE @likeQ{i} ESCAPE '\\')");
+                      $"{BuildHotValueLikeClause($"@likeQ{i}", includePinyin: true)})");
             }
             else if (spec.BroadTokens[i].Length >= 3)
             {
                 whereClauses.Add(
-                    $"c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i})");
+                    $"(c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i}) OR " +
+                    $"{BuildHotValueLikeClause($"@likeQ{i}", includePinyin: true)})");
             }
             else
             {
-                whereClauses.Add(
-                    $"(c.text_content LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.shortcut_phrase LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.source_search_text LIKE @likeQ{i} ESCAPE '\\')");
+                whereClauses.Add(BuildHotValueLikeClause($"@likeQ{i}", includePinyin: true));
             }
         }
     }
@@ -112,11 +95,34 @@ internal sealed partial class ClipboardHistoryStore
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
             var token = spec.BroadTokens[i];
+            cmd.Parameters.AddWithValue($"@likeQ{i}", $"%{EscapeLikePattern(token)}%");
             if (token.Length >= 3)
                 cmd.Parameters.AddWithValue($"@q{i}", $"\"{token.Replace("\"", "\"\"")}\"");
-            else
-                cmd.Parameters.AddWithValue($"@likeQ{i}", $"%{EscapeLikePattern(token)}%");
         }
+    }
+
+    private static string BuildHotValueLikeClause(string parameter, bool includePinyin)
+    {
+        var clauses = new List<string>
+        {
+            $"c.text_content LIKE {parameter} ESCAPE '\\'",
+            $"EXISTS (SELECT 1 FROM json_each(COALESCE(c.file_paths_json, '[]')) f WHERE CAST(f.value AS TEXT) LIKE {parameter} ESCAPE '\\')",
+            $"c.shortcut_phrase LIKE {parameter} ESCAPE '\\'",
+            $"c.ocr_text LIKE {parameter} ESCAPE '\\'",
+            $"printf('%dx%d', c.image_w, c.image_h) LIKE {parameter} ESCAPE '\\'",
+            $"c.source_app_name LIKE {parameter} ESCAPE '\\'",
+            $"c.source_exe_name LIKE {parameter} ESCAPE '\\'",
+            $"c.source_exe_path LIKE {parameter} ESCAPE '\\'",
+            $"c.source_window_title LIKE {parameter} ESCAPE '\\'",
+            $"c.source_window_class LIKE {parameter} ESCAPE '\\'",
+            $"c.source_focused_class LIKE {parameter} ESCAPE '\\'",
+            $"CAST(c.source_process_id AS TEXT) LIKE {parameter} ESCAPE '\\'",
+            $"CAST(c.source_hwnd AS TEXT) LIKE {parameter} ESCAPE '\\'",
+            $"c.source_capture_method LIKE {parameter} ESCAPE '\\'",
+        };
+        if (includePinyin)
+            clauses.Add($"c.pinyin_blob LIKE {parameter} ESCAPE '\\'");
+        return $"({string.Join(" OR ", clauses)})";
     }
 
     private static string BuildImageTypeClause()

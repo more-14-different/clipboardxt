@@ -37,6 +37,22 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
     }
 
     [Fact]
+    public void Search_AnchorsEachPersistedFilePathValue()
+    {
+        var store = CreateStore();
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Files,
+            FilePaths = [@"C:\docs\notes.txt", @"D:\exports\report-final.pdf"],
+            CopiedAt = DateTime.Now,
+        }));
+
+        Assert.Single(store.Search(" D:", null, 10));
+        Assert.Single(store.Search("report-final.pdf ", null, 10));
+        Assert.Empty(store.Search(" notes report-final.pdf ", null, 10));
+    }
+
+    [Fact]
     public void Search_ImageFilterIncludesClipboardImagesAndImageFilesAndHydratesBlob()
     {
         var store = CreateStore();
@@ -112,6 +128,28 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
         var entry = Assert.Single(store.Search("deploy-production", null, 10));
 
         Assert.Equal("deploy-production", entry.ShortcutPhrase);
+    }
+
+    [Fact]
+    public void Search_EndAnchorMatchesAnyPersistedSourceProperty()
+    {
+        var store = CreateStore();
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "unrelated content",
+            Source = new ClipboardSourceInfo
+            {
+                AppName = "Code",
+                WindowClass = "Chrome_WidgetWin-m",
+                CaptureMethod = "uia-m",
+            },
+            CopiedAt = DateTime.Now,
+        }));
+
+        var entry = Assert.Single(store.Search("-m ", null, 10));
+
+        Assert.Equal("uia-m", entry.Source!.CaptureMethod);
     }
 
     [Theory]
@@ -197,7 +235,7 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
             Assert.True(store.TryInsert(new ClipboardEntry
             {
                 Type = EntryType.Text,
-                TextContent = $"target decoy {i}",
+                TextContent = $"decoy {i} contains target",
                 ShortcutPhrase = "prefix",
                 CopiedAt = DateTime.Now.AddSeconds(i)
             }));

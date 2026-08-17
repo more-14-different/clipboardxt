@@ -142,9 +142,9 @@ internal sealed partial class ClipboardHistoryStore
         List<string> whereClauses)
     {
         if (spec.AnchorStart && !string.IsNullOrWhiteSpace(spec.StartNeedle))
-            whereClauses.Add("(c.text_content LIKE @likeQStart ESCAPE '\\' OR c.file_paths_json LIKE @likeQStart ESCAPE '\\')");
+            whereClauses.Add(BuildArchiveValueLikeClause("@likeQStart", includePinyin: false));
         if (spec.AnchorEnd && !string.IsNullOrWhiteSpace(spec.EndNeedle))
-            whereClauses.Add("(c.text_content LIKE @likeQEnd ESCAPE '\\' OR c.file_paths_json LIKE @likeQEnd ESCAPE '\\')");
+            whereClauses.Add(BuildArchiveValueLikeClause("@likeQEnd", includePinyin: false));
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
@@ -152,23 +152,34 @@ internal sealed partial class ClipboardHistoryStore
             {
                 whereClauses.Add(spec.BroadTokens[i].Length >= 3
                     ? $"({BuildWebUrlCandidateClause()} OR " +
-                      $"c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i}))"
+                      $"c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i}) OR " +
+                      $"{BuildArchiveValueLikeClause($"@likeQ{i}", includePinyin: true)})"
                     : $"({BuildWebUrlCandidateClause()} OR " +
-                      $"c.text_content LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' OR " +
-                      $"c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\')");
+                      $"{BuildArchiveValueLikeClause($"@likeQ{i}", includePinyin: true)})");
             }
             else if (spec.BroadTokens[i].Length >= 3)
             {
-                whereClauses.Add($"c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i})");
+                whereClauses.Add(
+                    $"(c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i}) OR " +
+                    $"{BuildArchiveValueLikeClause($"@likeQ{i}", includePinyin: true)})");
             }
             else
             {
-                whereClauses.Add(
-                    $"(c.text_content LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' " +
-                    $"OR c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\')");
+                whereClauses.Add(BuildArchiveValueLikeClause($"@likeQ{i}", includePinyin: true));
             }
         }
+    }
+
+    private static string BuildArchiveValueLikeClause(string parameter, bool includePinyin)
+    {
+        var clauses = new List<string>
+        {
+            $"c.text_content LIKE {parameter} ESCAPE '\\'",
+            $"EXISTS (SELECT 1 FROM json_each(COALESCE(c.file_paths_json, '[]')) f WHERE CAST(f.value AS TEXT) LIKE {parameter} ESCAPE '\\')",
+            $"printf('%dx%d', c.image_w, c.image_h) LIKE {parameter} ESCAPE '\\'",
+        };
+        if (includePinyin)
+            clauses.Add($"c.pinyin_blob LIKE {parameter} ESCAPE '\\'");
+        return $"({string.Join(" OR ", clauses)})";
     }
 }

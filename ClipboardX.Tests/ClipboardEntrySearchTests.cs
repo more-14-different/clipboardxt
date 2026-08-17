@@ -48,6 +48,59 @@ public sealed class ClipboardEntrySearchTests
     }
 
     [Theory]
+    [InlineData("code.exe ")]
+    [InlineData("Chrome_WidgetWin ")]
+    [InlineData("uia ")]
+    [InlineData("4242 ")]
+    [InlineData("987654 ")]
+    public void MatchesSearch_AppliesEndAnchorToEverySourceProperty(string query)
+    {
+        var entry = new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "unrelated content",
+            Source = new ClipboardSourceInfo
+            {
+                AppName = "Code",
+                ExeName = "code.exe",
+                WindowClass = "Chrome_WidgetWin",
+                ProcessId = 4242,
+                Hwnd = 987654,
+                CaptureMethod = "uia",
+            },
+        };
+
+        Assert.True(entry.MatchesSearch(query));
+    }
+
+    [Fact]
+    public void MatchesSearch_DoesNotSatisfyOneRuleAcrossDifferentProperties()
+    {
+        var entry = new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "alpha body",
+            Source = new ClipboardSourceInfo { WindowTitle = "suffix" },
+        };
+
+        Assert.False(entry.MatchesSearch(" alpha suffix "));
+    }
+
+    [Fact]
+    public void MatchesSearch_AppliesAnchorsToEachFilePathInsteadOfSerializedArrayText()
+    {
+        var entry = new ClipboardEntry
+        {
+            Type = EntryType.Files,
+            FilePaths = [@"C:\docs\notes.txt", @"D:\exports\report-final.pdf"],
+        };
+
+        Assert.True(entry.MatchesSearch(" D:"));
+        Assert.True(entry.MatchesSearch("report-final.pdf "));
+        Assert.False(entry.MatchesSearch(" notes report-final.pdf "));
+    }
+
+    [Theory]
     [InlineData("网址")]
     [InlineData("URL")]
     public void MatchesSearch_FindsDerivedWebUrlMetadata(string query)

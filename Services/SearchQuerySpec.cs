@@ -151,6 +151,19 @@ internal sealed class SearchQuerySpec
         return true;
     }
 
+    public bool MatchesAnyTextOrPinyin(
+        IEnumerable<string> searchableValues,
+        Func<string, string, bool> tokenMatches)
+    {
+        foreach (var value in searchableValues)
+        {
+            if (MatchesTextOrPinyin(value, value, tokenMatches))
+                return true;
+        }
+
+        return false;
+    }
+
     private static string[] TokenizeBody(string body)
     {
         var tokens = new List<string>();

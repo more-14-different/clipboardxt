@@ -20,7 +20,10 @@ public sealed class ClipboardSourceInfo
         || !string.IsNullOrWhiteSpace(WindowTitle)
         || !string.IsNullOrWhiteSpace(WindowClass)
         || !string.IsNullOrWhiteSpace(FocusedClass)
-        || !string.IsNullOrWhiteSpace(ExePath);
+        || !string.IsNullOrWhiteSpace(ExePath)
+        || ProcessId != 0
+        || Hwnd != 0
+        || !string.IsNullOrWhiteSpace(CaptureMethod);
 
     public string DisplayName
     {
@@ -42,6 +45,8 @@ public sealed class ClipboardSourceInfo
         Append(sb, WindowClass);
         Append(sb, FocusedClass);
         if (ProcessId != 0) Append(sb, ProcessId.ToString());
+        if (Hwnd != 0) Append(sb, Hwnd.ToString());
+        Append(sb, CaptureMethod);
         return sb.ToString();
     }
 

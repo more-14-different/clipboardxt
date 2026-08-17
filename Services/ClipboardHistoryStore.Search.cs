@@ -100,11 +100,5 @@ internal sealed partial class ClipboardHistoryStore
     }
 
     private static bool MatchesEntrySearchSpec(ClipboardEntry entry, SearchQuerySpec spec) =>
-        spec.MatchesTextOrPinyin(
-            entry.FullSearchableText,
-            entry.SearchableText,
-            (searchable, token) =>
-                searchable.Contains(token, StringComparison.OrdinalIgnoreCase)
-                || (entry.IsWebUrl && WebUrlLauncher.IsMetadataSearchToken(token, PinyinFilterMode))
-                || entry.PinyinSearchBlob.Contains(token, StringComparison.OrdinalIgnoreCase));
+        entry.MatchesSearch(spec, PinyinFilterMode);
 }

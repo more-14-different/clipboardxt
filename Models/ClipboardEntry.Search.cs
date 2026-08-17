@@ -84,6 +84,53 @@ public partial class ClipboardEntry
     }
 
     /// <summary>
+    /// 可检索的各属性值。查询锚点必须在同一个属性值内成立，不能借助拼接文本跨属性命中。
+    /// </summary>
+    public string[] SearchableValues
+    {
+        get
+        {
+            var values = new List<string>();
+            AddDistinct(values, ShortcutPhrase);
+
+            switch (Type)
+            {
+                case EntryType.Text:
+                    AddDistinct(values, TextContent);
+                    break;
+                case EntryType.Files:
+                    foreach (var path in FilePaths ?? []) AddDistinct(values, path);
+                    break;
+                case EntryType.Image:
+                    AddDistinct(values, $"image 图片 {ImageWidth}x{ImageHeight}");
+                    AddDistinct(values, OcrText);
+                    break;
+            }
+
+            if (IsWebUrl)
+            {
+                AddDistinct(values, "网址");
+                AddDistinct(values, "URL");
+            }
+
+            if (Source != null)
+            {
+                AddDistinct(values, Source.AppName);
+                AddDistinct(values, Source.ExeName);
+                AddDistinct(values, Source.ExePath);
+                AddDistinct(values, Source.WindowTitle);
+                AddDistinct(values, Source.WindowClass);
+                AddDistinct(values, Source.FocusedClass);
+                if (Source.ProcessId != 0) AddDistinct(values, Source.ProcessId.ToString());
+                if (Source.Hwnd != 0) AddDistinct(values, Source.Hwnd.ToString());
+                AddDistinct(values, Source.CaptureMethod);
+            }
+
+            return values.ToArray();
+        }
+    }
+
+    /// <summary>
     /// 当前中文过滤模式对应的拼音检索串（小写、无空格），用于 QuickPaste 内存检索。
     /// 普通历史的拼音检索已下沉到 SQLite FTS5。
     /// </summary>
@@ -123,21 +170,20 @@ public partial class ClipboardEntry
         var spec = SearchQuerySpec.Parse(query);
         if (spec.IsEmpty) return true;
 
-        return spec.MatchesTextOrPinyin(FullSearchableText, SearchableText, MatchesSearchToken);
+        return MatchesSearch(spec, PinyinFilterMode);
     }
 
-    private bool MatchesSearchToken(string searchable, string token)
+    internal bool MatchesSearch(SearchQuerySpec spec, string? pinyinMode) =>
+        spec.MatchesAnyTextOrPinyin(
+            SearchableValues,
+            (searchable, token) => MatchesSearchToken(searchable, token, pinyinMode));
+
+    private bool MatchesSearchToken(string searchable, string token, string? pinyinMode)
     {
         if (searchable.Contains(token, StringComparison.OrdinalIgnoreCase)) return true;
         // 旧历史的持久化拼音索引早于「网址」派生标签，直接匹配标签可避免要求用户重建索引。
-        if (IsWebUrl && WebUrlLauncher.IsMetadataSearchToken(token, PinyinFilterMode)) return true;
-        if (PinyinFilterModes.Normalize(PinyinFilterMode) == PinyinFilterModes.Traditional)
-        {
-            var py = PinyinSearchBlob;
-            return py.Length > 0 && py.Contains(token, StringComparison.OrdinalIgnoreCase);
-        }
-
-        return PinyinSearchIndex.MatchesToken(searchable, token, PinyinFilterMode);
+        if (IsWebUrl && WebUrlLauncher.IsMetadataSearchToken(token, pinyinMode)) return true;
+        return PinyinSearchIndex.MatchesToken(searchable, token, pinyinMode);
     }
 
     private static void AddDistinct(List<string> parts, string? value)
