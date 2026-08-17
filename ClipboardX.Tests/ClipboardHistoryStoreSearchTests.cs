@@ -140,6 +140,24 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
     }
 
     [Fact]
+    public void Search_XiaoheFindsLegacyWebUrlWithoutDerivedMetadataInPersistedPinyin()
+    {
+        var store = CreateStore();
+        Assert.True(store.TryInsert(new ClipboardEntry
+        {
+            Type = EntryType.Text,
+            TextContent = "https://example.com/legacy",
+            CopiedAt = DateTime.Now
+        }));
+        ClearPersistedPinyinBlob();
+
+        var entry = Assert.Single(store.Search("whvi", null, 10));
+
+        Assert.Equal("https://example.com/legacy", entry.TextContent);
+        Assert.True(entry.IsWebUrl);
+    }
+
+    [Fact]
     public void Search_FindsArchivedWebUrlByDerivedMetadata()
     {
         var store = CreateStore();
@@ -312,6 +330,15 @@ public sealed class ClipboardHistoryStoreSearchTests : IDisposable
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "PRAGMA user_version";
         return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    private void ClearPersistedPinyinBlob()
+    {
+        using var conn = new SqliteConnection($"Data Source={_databasePath}");
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE clipboard_history SET pinyin_blob = ''";
+        cmd.ExecuteNonQuery();
     }
 
     public void Dispose()

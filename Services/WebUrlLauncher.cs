@@ -123,9 +123,10 @@ internal static class WebUrlLauncher
         return true;
     }
 
-    internal static bool IsMetadataSearchToken(string token) =>
+    internal static bool IsMetadataSearchToken(string token, string? pinyinMode = null) =>
         token.Equals("网址", StringComparison.OrdinalIgnoreCase)
-        || token.Equals("URL", StringComparison.OrdinalIgnoreCase);
+        || token.Equals("URL", StringComparison.OrdinalIgnoreCase)
+        || PinyinSearchIndex.MatchesToken("网址", token, pinyinMode);
 
     internal static bool TryResolveSourceBrowser(
         ClipboardSourceInfo? source,

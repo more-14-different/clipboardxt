@@ -9,7 +9,7 @@ internal sealed partial class ClipboardHistoryStore
         !spec.IsEmpty
         && spec.BroadTokens.Length > 0
         && spec.BroadTokens.All(token =>
-            token.Length >= 3 || WebUrlLauncher.IsMetadataSearchToken(token));
+            token.Length >= 3 || WebUrlLauncher.IsMetadataSearchToken(token, PinyinFilterMode));
 
     private static List<ClipboardEntry> SearchArchived(
         SqliteConnection conn,
@@ -148,9 +148,15 @@ internal sealed partial class ClipboardHistoryStore
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
-            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i]))
+            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i], PinyinFilterMode))
             {
-                whereClauses.Add(BuildWebUrlCandidateClause());
+                whereClauses.Add(spec.BroadTokens[i].Length >= 3
+                    ? $"({BuildWebUrlCandidateClause()} OR " +
+                      $"c.archive_id IN (SELECT rowid FROM {ftsTable} WHERE {ftsTable} MATCH @q{i}))"
+                    : $"({BuildWebUrlCandidateClause()} OR " +
+                      $"c.text_content LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\')");
             }
             else if (spec.BroadTokens[i].Length >= 3)
             {

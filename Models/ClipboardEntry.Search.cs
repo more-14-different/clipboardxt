@@ -129,6 +129,8 @@ public partial class ClipboardEntry
     private bool MatchesSearchToken(string searchable, string token)
     {
         if (searchable.Contains(token, StringComparison.OrdinalIgnoreCase)) return true;
+        // 旧历史的持久化拼音索引早于「网址」派生标签，直接匹配标签可避免要求用户重建索引。
+        if (IsWebUrl && WebUrlLauncher.IsMetadataSearchToken(token, PinyinFilterMode)) return true;
         if (PinyinFilterModes.Normalize(PinyinFilterMode) == PinyinFilterModes.Traditional)
         {
             var py = PinyinSearchBlob;

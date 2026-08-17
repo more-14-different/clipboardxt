@@ -72,9 +72,17 @@ internal sealed partial class ClipboardHistoryStore
 
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
-            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i]))
+            if (WebUrlLauncher.IsMetadataSearchToken(spec.BroadTokens[i], PinyinFilterMode))
             {
-                whereClauses.Add(BuildWebUrlCandidateClause());
+                whereClauses.Add(spec.BroadTokens[i].Length >= 3
+                    ? $"({BuildWebUrlCandidateClause()} OR " +
+                      $"c.id IN (SELECT rowid FROM clipboard_history_fts WHERE clipboard_history_fts MATCH @q{i}))"
+                    : $"({BuildWebUrlCandidateClause()} OR " +
+                      $"c.text_content LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.file_paths_json LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.shortcut_phrase LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.pinyin_blob LIKE @likeQ{i} ESCAPE '\\' OR " +
+                      $"c.source_search_text LIKE @likeQ{i} ESCAPE '\\')");
             }
             else if (spec.BroadTokens[i].Length >= 3)
             {
@@ -104,8 +112,6 @@ internal sealed partial class ClipboardHistoryStore
         for (var i = 0; i < spec.BroadTokens.Length; i++)
         {
             var token = spec.BroadTokens[i];
-            if (WebUrlLauncher.IsMetadataSearchToken(token))
-                continue;
             if (token.Length >= 3)
                 cmd.Parameters.AddWithValue($"@q{i}", $"\"{token.Replace("\"", "\"\"")}\"");
             else

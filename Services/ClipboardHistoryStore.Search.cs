@@ -105,5 +105,6 @@ internal sealed partial class ClipboardHistoryStore
             entry.SearchableText,
             (searchable, token) =>
                 searchable.Contains(token, StringComparison.OrdinalIgnoreCase)
+                || (entry.IsWebUrl && WebUrlLauncher.IsMetadataSearchToken(token, PinyinFilterMode))
                 || entry.PinyinSearchBlob.Contains(token, StringComparison.OrdinalIgnoreCase));
 }
