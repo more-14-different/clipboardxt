@@ -21,9 +21,7 @@ public partial class PopupWindow
         PinHeaderBorder.Background = _popupPinned
             ? (Brush)FindResource("BatchModeTagFill")
             : Brushes.Transparent;
-        PinHeaderIcon.Foreground = _popupPinned
-            ? (Brush)FindResource("BatchModeTagFg")
-            : (Brush)FindResource("SecondaryText");
+        PinHeaderIcon.Opacity = _popupPinned ? 1.0 : 0.68;
         PinHeaderBorder.ToolTip = _popupPinned
             ? "已置顶：粘贴后保持窗口打开；再次点击取消或按 Esc 关闭"
             : "置顶：粘贴后保持窗口打开，便于连续粘贴";

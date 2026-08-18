@@ -327,12 +327,14 @@ public partial class FileDialogJumpPickerWindow : Window
 
     private void UpdateFilterModeUi()
     {
-        (FileJumpTypeFilterIcon.Text, FileJumpTypeFilterText.Text) = _filterMode switch
+        var (kind, text) = _filterMode switch
         {
-            FileJumpPickerFilterMode.FavoritesOnly => ("★", "收藏"),
-            FileJumpPickerFilterMode.RecentOnly => ("◷", "常用"),
-            _ => ("●", "全部")
+            FileJumpPickerFilterMode.FavoritesOnly => (CommandIconKind.Favorite, "收藏"),
+            FileJumpPickerFilterMode.RecentOnly => (CommandIconKind.Folder, "常用"),
+            _ => (CommandIconKind.Filter, "全部")
         };
+        FileJumpTypeFilterIcon.Source = CommandIconSvg.Get(kind);
+        FileJumpTypeFilterText.Text = text;
     }
 }
 

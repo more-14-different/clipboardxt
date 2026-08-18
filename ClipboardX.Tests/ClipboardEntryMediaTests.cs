@@ -10,6 +10,34 @@ namespace ClipboardManager.Tests;
 
 public sealed class ClipboardEntryMediaTests
 {
+    [Theory]
+    [InlineData(CommandIconKind.Clipboard)]
+    [InlineData(CommandIconKind.Pin)]
+    [InlineData(CommandIconKind.Settings)]
+    [InlineData(CommandIconKind.Search)]
+    [InlineData(CommandIconKind.Empty)]
+    [InlineData(CommandIconKind.Paste)]
+    [InlineData(CommandIconKind.OpenUrl)]
+    [InlineData(CommandIconKind.Folder)]
+    [InlineData(CommandIconKind.Json)]
+    [InlineData(CommandIconKind.Edit)]
+    [InlineData(CommandIconKind.QuickPhrase)]
+    [InlineData(CommandIconKind.Favorite)]
+    [InlineData(CommandIconKind.Delete)]
+    [InlineData(CommandIconKind.Batch)]
+    [InlineData(CommandIconKind.Text)]
+    [InlineData(CommandIconKind.Image)]
+    [InlineData(CommandIconKind.File)]
+    [InlineData(CommandIconKind.Filter)]
+    public void CommandSvgIcon_RendersAsFrozenImage(CommandIconKind kind)
+    {
+        var image = CommandIconSvg.Get(kind);
+
+        Assert.NotNull(image);
+        Assert.True(image.IsFrozen);
+        Assert.Same(image, CommandIconSvg.Get(kind));
+    }
+
     [Fact]
     public void ValidClipboardImage_UsesThumbnailSlot()
     {

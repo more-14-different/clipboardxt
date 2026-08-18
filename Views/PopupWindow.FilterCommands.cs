@@ -55,15 +55,17 @@ public partial class PopupWindow : Window
 
     private void UpdateTypeFilterUi()
     {
-        (TypeFilterIcon.Text, TypeFilterText.Text) = _quickPhraseOnly
-            ? ("⚡", "短语")
+        var (kind, text) = _quickPhraseOnly
+            ? (CommandIconKind.QuickPhrase, "短语")
             : _typeFilter switch
             {
-                EntryType.Text => ("T", "文本"),
-                EntryType.Image => ("▣", "图片"),
-                EntryType.Files => ("▰", "文件"),
-                _ => ("●", "全部")
+                EntryType.Text => (CommandIconKind.Text, "文本"),
+                EntryType.Image => (CommandIconKind.Image, "图片"),
+                EntryType.Files => (CommandIconKind.File, "文件"),
+                _ => (CommandIconKind.Filter, "全部")
             };
+        TypeFilterIcon.Source = CommandIconSvg.Get(kind);
+        TypeFilterText.Text = text;
     }
 
     private void PasteByIndex(int index)

@@ -19,12 +19,12 @@ public partial class FileDialogJumpPickerWindow : Window
         CtxTransferPath.IsEnabled = row != null;
         CtxCommitSelection.Header = UiLanguage.T(
             _isStandaloneMode
-                ? "📂 打开文件夹"
+                ? "打开文件夹"
                 : _autoForegroundStickyMode
-                    ? "📂 切换目录"
-                    : "📂 跳转到目录");
+                    ? "切换目录"
+                    : "跳转到目录");
         CtxTransferPath.Header = UiLanguage.T(
-            _isStandaloneMode ? "📋 粘贴路径" : "📋 复制路径");
+            _isStandaloneMode ? "粘贴路径" : "复制路径");
         CtxAddFavorite.Visibility = row is { IsFavorite: false } ? Visibility.Visible : Visibility.Collapsed;
         CtxRemoveFavorite.Visibility = row is { IsFavorite: true } ? Visibility.Visible : Visibility.Collapsed;
         CtxEditPhrase.Visibility = row is { IsFavorite: true } ? Visibility.Visible : Visibility.Collapsed;

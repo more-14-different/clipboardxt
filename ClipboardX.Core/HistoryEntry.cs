@@ -82,12 +82,20 @@ public sealed class HistoryEntry
         }
     }
 
-    public string TypeEmoji => Type switch
+    public string TypeBadge => Type switch
     {
-        EntryType.Text => "📝",
-        EntryType.Image => "🖼️",
-        EntryType.Files => "📁",
+        EntryType.Text => "T",
+        EntryType.Image => "IMG",
+        EntryType.Files => "FILE",
         _ => ""
+    };
+
+    public string TypeBadgeColor => Type switch
+    {
+        EntryType.Text => "#1687E8",
+        EntryType.Image => "#EC4899",
+        EntryType.Files => "#D99A24",
+        _ => "#64748B"
     };
 
     /// <summary>列表主行预览。</summary>

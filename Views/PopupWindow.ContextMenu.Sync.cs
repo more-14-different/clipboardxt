@@ -39,9 +39,9 @@ public partial class PopupWindow : Window
             .OrderBy(selected => _displayItems.IndexOf(selected))
             .ToList();
         var policy = ClipboardContextMenuPolicy.Evaluate(selectedEntries, GetBatchMode());
-        CtxStarText.Text = entry.IsStarred ? "☆ 取消收藏" : "★ 收藏";
+        CtxStarText.Text = entry.IsStarred ? "取消收藏" : "收藏";
         CtxStarBorder.Visibility = entry.IsQuickPaste ? Visibility.Collapsed : Visibility.Visible;
-        CtxShortcutText.Text = !string.IsNullOrWhiteSpace(entry.ShortcutPhrase) ? "⚡ 修改快捷短语" : "⚡ 设为快捷短语";
+        CtxShortcutText.Text = !string.IsNullOrWhiteSpace(entry.ShortcutPhrase) ? "修改快捷短语" : "设为快捷短语";
         CtxLinePasteBorder.Visibility = policy.ShowLinePaste
             ? Visibility.Visible
             : Visibility.Collapsed;

@@ -47,18 +47,18 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="📁" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <Image Source="{local:SvgIcon Kind=Folder}" Width="18" Height="18"
+                               Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <TextBlock Text="跳转到文件夹" FontSize="15" FontWeight="SemiBold"
                                    Foreground="{DynamicResource PrimaryText}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <Border Grid.Column="1" Background="{DynamicResource SurfaceBrush}" CornerRadius="10"
                             Padding="8,3" Margin="8,0,0,0" Cursor="Hand"
                             MouseLeftButtonUp="FileJumpTypeFilter_Click"
-                            ToolTip="类型筛选（Tab 切换）">
+                        ToolTip="类型筛选（Tab 切换）">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="FileJumpTypeFilterIcon" Text="●" FontFamily="Segoe UI Symbol"
-                                       FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource AccentBg}" VerticalAlignment="Center"/>
+                            <Image x:Name="FileJumpTypeFilterIcon" Source="{local:SvgIcon Kind=Filter}"
+                                   Width="14" Height="14" VerticalAlignment="Center"/>
                             <TextBlock x:Name="FileJumpTypeFilterText" Text="全部" FontSize="11" Margin="5,0,0,0"
                                        Foreground="{DynamicResource SecondaryText}" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -75,7 +75,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="🔍" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <Image Source="{local:SvgIcon Kind=Search}" Width="15" Height="15"
+                               Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <TextBlock x:Name="SearchTextBlock" Grid.Column="1" Foreground="{DynamicResource PrimaryText}"
                                    FontSize="13" VerticalAlignment="Center" Background="Transparent" Cursor="IBeam"
                                    Focusable="False"
@@ -122,15 +123,27 @@
                     <ListBox.ContextMenu>
                         <ContextMenu x:Name="JumpRowContextMenu" Opened="JumpRowContextMenu_Opened">
                             <MenuItem x:Name="CtxCommitSelection" Header="打开" InputGestureText="Enter"
-                                      Click="CtxCommitSelection_Click"/>
+                                      Click="CtxCommitSelection_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Folder}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
                             <MenuItem x:Name="CtxTransferPath" Header="粘贴路径" InputGestureText="Ctrl+Enter"
-                                      Click="CtxTransferPath_Click"/>
+                                      Click="CtxTransferPath_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Paste}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
                             <Separator/>
-                            <MenuItem x:Name="CtxAddFavorite" Header="⭐ 加入收藏" Click="CtxAddFavorite_Click"/>
-                            <MenuItem x:Name="CtxRemoveFavorite" Header="移除收藏" Click="CtxRemoveFavorite_Click"/>
-                            <MenuItem x:Name="CtxEditPhrase" Header="✎ 修改关键词…" Click="CtxEditPhrase_Click"/>
+                            <MenuItem x:Name="CtxAddFavorite" Header="加入收藏" Click="CtxAddFavorite_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Favorite}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem x:Name="CtxRemoveFavorite" Header="移除收藏" Click="CtxRemoveFavorite_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Favorite}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem x:Name="CtxEditPhrase" Header="修改关键词…" Click="CtxEditPhrase_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Edit}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
                             <Separator/>
-                            <MenuItem x:Name="CtxRemoveRecentFolder" Header="移除常用路径" Click="CtxRemoveRecentFolder_Click"/>
+                            <MenuItem x:Name="CtxRemoveRecentFolder" Header="移除常用路径" Click="CtxRemoveRecentFolder_Click">
+                                <MenuItem.Icon><Image Source="{local:SvgIcon Kind=Delete}" Width="16" Height="16"/></MenuItem.Icon>
+                            </MenuItem>
                         </ContextMenu>
                     </ListBox.ContextMenu>
                     <ListBox.ItemTemplate>
@@ -145,9 +158,8 @@
                                 <TextBlock Grid.Column="0" Text="{Binding IndexLabel}"
                                            FontSize="10" TextAlignment="Center"
                                            Foreground="{DynamicResource MutedText}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding TypeIcon}"
-                                           FontSize="14" Width="26" TextAlignment="Center"
-                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <Image Grid.Column="1" Source="{local:SvgIcon Kind=Folder}"
+                                       Width="20" Height="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,8,0">
                                     <local:SearchHighlightTextBlock DisplayText="{Binding PathLineTruncated}"
                                                                    ToolTip="{Binding PathLine}"
@@ -168,10 +180,9 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </StackPanel>
-                                <TextBlock Grid.Column="3" Text="★"
-                                           Foreground="{DynamicResource AccentBg}" FontSize="13"
-                                           VerticalAlignment="Center" Margin="0,0,6,0"
-                                           Visibility="{Binding StarVisibility}"/>
+                                <Image Grid.Column="3" Source="{local:SvgIcon Kind=Favorite}"
+                                       Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,6,0"
+                                       Visibility="{Binding StarVisibility}"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

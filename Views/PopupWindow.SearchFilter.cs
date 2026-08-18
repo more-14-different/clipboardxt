@@ -231,14 +231,14 @@ public partial class PopupWindow : Window
 
         if (_searchText.Length > 0 && !hasItems)
         {
-            EmptyIcon.Text = "🔍"; EmptyText.Text = "无匹配结果";
+            EmptyIcon.Source = CommandIconSvg.Get(CommandIconKind.Search); EmptyText.Text = "无匹配结果";
             EmptySubText.Text = PinyinFilterModes.Normalize(_appSettings?.PinyinFilterMode) == PinyinFilterModes.Xiaohe
                 ? "可试小鹤双拼全码或声母串，如「nihc」「nh」"
                 : "可试拼音全拼或首字母，如「nihao」「nh」";
         }
         else if (!hasItems)
         {
-            EmptyIcon.Text = "📭"; EmptyText.Text = "暂无剪切板记录"; EmptySubText.Text = "复制一些文本即可开始";
+            EmptyIcon.Source = CommandIconSvg.Get(CommandIconKind.Empty); EmptyText.Text = "暂无剪切板记录"; EmptySubText.Text = "复制一些文本即可开始";
         }
 
         var regularCount = _allItems.Count(x => !x.IsQuickPaste);

@@ -31,9 +31,13 @@
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="core:HistoryEntry">
                     <Grid ColumnDefinitions="Auto,*" Margin="0,4">
-                        <TextBlock Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Top"
-                                   FontSize="14"
-                                   Text="{Binding TypeEmoji}"/>
+                        <Border Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Top"
+                                Width="30" Height="24" CornerRadius="6"
+                                Background="{Binding TypeBadgeColor}">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="White" FontSize="9" FontWeight="SemiBold"
+                                       Text="{Binding TypeBadge}"/>
+                        </Border>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="{Binding PreviewLine}"
                                        FontWeight="SemiBold"

@@ -2,6 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ClipboardManager.Services;
 
@@ -178,13 +179,22 @@ public partial class ClipboardEntry
 
     public string TypeIcon => Type switch
     {
-        EntryType.Text => IsQuickPaste ? "⚡" : "T",
+        EntryType.Text => IsQuickPaste ? "QP" : "T",
         EntryType.Image => "IMG",
         EntryType.Files => IsImageFile ? "IMG" : "FILE",
         _ => ""
     };
 
     public string ContentTypeBadge => TypeIcon;
+
+    public ImageSource TypeFallbackIcon => CommandIconSvg.Get(Type switch
+    {
+        EntryType.Text when IsQuickPaste => CommandIconKind.QuickPhrase,
+        EntryType.Text => CommandIconKind.Text,
+        EntryType.Image => CommandIconKind.Image,
+        EntryType.Files => CommandIconKind.File,
+        _ => CommandIconKind.Clipboard,
+    });
 
     public string Preview => Type switch
     {

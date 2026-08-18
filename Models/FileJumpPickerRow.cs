@@ -51,8 +51,6 @@ public sealed class FileJumpPickerRow : INotifyPropertyChanged
 
     public string IndexLabel => DisplayIndex is >= 1 and <= 9 ? DisplayIndex.ToString() : "";
 
-    public string TypeIcon => "📁";
-
     public string PreviewLine => PathLineTruncated;
 
     public string PathLine => Path;

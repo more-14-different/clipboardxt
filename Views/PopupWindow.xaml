@@ -66,7 +66,8 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Cursor="SizeAll"
                             MouseLeftButtonDown="Header_DragStart">
-                    <TextBlock Text="📋" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <Image Source="{local:SvgIcon Kind=Clipboard}" Width="18" Height="18"
+                           Margin="0,0,8,0" VerticalAlignment="Center"/>
                     <TextBlock Text="剪切板历史" FontSize="15" FontWeight="SemiBold"
                                Foreground="{DynamicResource PrimaryText}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ItemCountText" FontSize="12" Foreground="{DynamicResource SecondaryText}"
@@ -93,21 +94,20 @@
                 <Border x:Name="PinHeaderBorder" Grid.Column="2" Background="Transparent" CornerRadius="8"
                         Cursor="Hand" Margin="0,0,6,0" Padding="4,2"
                         MouseLeftButtonUp="Pin_Click" ToolTip="置顶：粘贴后保持窗口打开，便于连续粘贴">
-                    <TextBlock x:Name="PinHeaderIcon" Text="📌" FontSize="13" VerticalAlignment="Center"
-                               Foreground="{DynamicResource SecondaryText}"/>
+                    <Image x:Name="PinHeaderIcon" Source="{local:SvgIcon Kind=Pin}" Width="16" Height="16"
+                           VerticalAlignment="Center"/>
                 </Border>
                 <Border Grid.Column="3" Background="Transparent" Cursor="Hand" Margin="0,0,10,0"
                         MouseLeftButtonUp="Settings_Click" ToolTip="设置">
-                    <TextBlock Text="⚙" FontSize="14" Foreground="{DynamicResource SecondaryText}" VerticalAlignment="Center"/>
+                    <Image Source="{local:SvgIcon Kind=Settings}" Width="16" Height="16" VerticalAlignment="Center"/>
                 </Border>
                 <!-- Type filter button -->
                 <Border Grid.Column="4" Background="{DynamicResource SurfaceBrush}" CornerRadius="10"
                         Padding="8,3" Cursor="Hand" MouseLeftButtonUp="TypeFilter_Click"
                         ToolTip="类型筛选（Tab 切换）">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="TypeFilterIcon" Text="●" FontFamily="Segoe UI Symbol"
-                                   FontSize="11" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource AccentBg}" VerticalAlignment="Center"/>
+                        <Image x:Name="TypeFilterIcon" Source="{local:SvgIcon Kind=Filter}"
+                               Width="14" Height="14" VerticalAlignment="Center"/>
                         <TextBlock x:Name="TypeFilterText" Text="全部" FontSize="11" Margin="5,0,0,0"
                                    Foreground="{DynamicResource SecondaryText}" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -125,7 +125,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="🔍" FontSize="12" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <Image Source="{local:SvgIcon Kind=Search}" Width="15" Height="15"
+                           Margin="0,0,8,0" VerticalAlignment="Center"/>
                     <TextBlock x:Name="SearchTextBlock" Grid.Column="1" Foreground="{DynamicResource PrimaryText}"
                                FontSize="13" VerticalAlignment="Center" Background="Transparent" Cursor="IBeam"
                                Focusable="False"
@@ -236,11 +237,9 @@
                                     <Image Source="{Binding DisplayIcon}" Width="22" Height="22"
                                            Stretch="Uniform"
                                            Visibility="{Binding DisplayIconVisibility}"/>
-                                    <TextBlock Text="{Binding ContentTypeBadge}"
-                                               FontSize="9" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource SecondaryText}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                                               Visibility="{Binding TypeFallbackIconVisibility}"/>
+                                    <Image Source="{Binding TypeFallbackIcon}" Width="22" Height="22"
+                                           Stretch="Uniform"
+                                           Visibility="{Binding TypeFallbackIconVisibility}"/>
                                     <Border Width="16" Height="12" CornerRadius="3"
                                             Background="{DynamicResource PopupBgBrush}"
                                             BorderBrush="{DynamicResource ThemeBorder}" BorderThickness="1"
@@ -383,7 +382,8 @@
 
                 <StackPanel x:Name="EmptyHint" VerticalAlignment="Center" HorizontalAlignment="Center"
                             Margin="0,30" Visibility="Visible">
-                    <TextBlock x:Name="EmptyIcon" Text="📭" FontSize="28" HorizontalAlignment="Center"/>
+                    <Image x:Name="EmptyIcon" Source="{local:SvgIcon Kind=Empty}" Width="32" Height="32"
+                           HorizontalAlignment="Center"/>
                     <TextBlock x:Name="EmptyText" Text="暂无剪切板记录" Foreground="{DynamicResource SecondaryText}" FontSize="13"
                                HorizontalAlignment="Center" Margin="0,8,0,0"/>
                     <TextBlock x:Name="EmptySubText" Text="复制一些文本即可开始" Foreground="{DynamicResource MutedText}" FontSize="11"
@@ -648,8 +648,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="📋 粘贴" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxPasteHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Paste}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="粘贴" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxPasteHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxLinePasteBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -702,8 +706,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="🌐 打开所选网址" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock Text="Alt+Shift+Enter" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=OpenUrl}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="打开所选网址" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" Text="Alt+Shift+Enter" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxPasteAsFileBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -720,8 +728,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="📁 作为文件粘贴（资源管理器）" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxPasteAsFileHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Folder}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="作为文件粘贴（资源管理器）" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxPasteAsFileHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxPasteJsonFileBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -738,8 +750,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="📄 粘贴为 JSON 文件（资源管理器）" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxPasteJsonHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Json}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="粘贴为 JSON 文件（资源管理器）" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxPasteJsonHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxEditTextBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -756,8 +772,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="✏️ 编辑文本" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxEditTextHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Edit}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="编辑文本" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxEditTextHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxShortcutBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -773,8 +793,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock x:Name="CtxShortcutText" Text="⚡ 设为快捷短语" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxShortcutHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=QuickPhrase}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" x:Name="CtxShortcutText" Text="设为快捷短语" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxShortcutHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border x:Name="CtxStarBorder" Padding="10,7" CornerRadius="6" Cursor="Hand"
@@ -790,8 +814,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock x:Name="CtxStarText" Text="★ 收藏" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxStarHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Favorite}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" x:Name="CtxStarText" Text="收藏" Foreground="{DynamicResource PrimaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxStarHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                         <Border Height="1" Background="{DynamicResource ThemeSeparator}" Margin="4,2"/>
@@ -808,8 +836,12 @@
                                 </Style>
                             </Border.Style>
                             <Grid MinWidth="300">
-                                <TextBlock Text="🗑 删除" Foreground="{DynamicResource SecondaryText}" FontSize="13"/>
-                                <TextBlock x:Name="CtxDeleteHotkeyText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedText}" FontSize="12"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{local:SvgIcon Kind=Delete}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1" Text="删除" Foreground="{DynamicResource SecondaryText}" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="CtxDeleteHotkeyText" Foreground="{DynamicResource MutedText}" FontSize="12"/>
                             </Grid>
                         </Border>
                     </StackPanel>
@@ -837,8 +869,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <TextBlock Text="📋 批量粘贴（依次贴完全部队列）" Foreground="{DynamicResource PrimaryText}" FontSize="13"
-                                       TextWrapping="Wrap"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{local:SvgIcon Kind=Batch}" Width="16" Height="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="批量粘贴（依次贴完全部队列）" Foreground="{DynamicResource PrimaryText}" FontSize="13"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>
@@ -856,8 +891,11 @@
                 <DropShadowEffect BlurRadius="16" ShadowDepth="3" Opacity="0.45" Color="Black"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="⚡ 快捷短语" FontSize="14" FontWeight="SemiBold"
-                           Foreground="{DynamicResource PrimaryText}" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Image Source="{local:SvgIcon Kind=QuickPhrase}" Width="18" Height="18" Margin="0,0,8,0"/>
+                    <TextBlock Text="快捷短语" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryText}"/>
+                </StackPanel>
                 <TextBlock x:Name="PhrasePreview" FontSize="12" TextTrimming="CharacterEllipsis"
                            Foreground="{DynamicResource SecondaryText}" Margin="0,0,0,12" MaxHeight="36"
                            TextWrapping="Wrap"/>
@@ -920,8 +958,11 @@
                 <DropShadowEffect BlurRadius="16" ShadowDepth="3" Opacity="0.45" Color="Black"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="✏️ 编辑文本" FontSize="14" FontWeight="SemiBold"
-                           Foreground="{DynamicResource PrimaryText}" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Image Source="{local:SvgIcon Kind=Edit}" Width="18" Height="18" Margin="0,0,8,0"/>
+                    <TextBlock Text="编辑文本" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryText}"/>
+                </StackPanel>
                 <TextBlock Text="保存后将替换当前历史项（含数据库中的记录）。" FontSize="11"
                            Foreground="{DynamicResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,10"/>
                 <TextBox x:Name="EntryTextEditBox" AcceptsReturn="True" TextWrapping="Wrap"
